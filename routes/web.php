@@ -7,6 +7,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\GuruBkController;
 use App\Http\Controllers\PelanggaranController;
 use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\KonsultasiController;
 use App\Models\OrangTua;
 use App\Models\Pengaduan;
 use Database\Seeders\GuruBkSeeder;
@@ -76,11 +77,11 @@ Route::middleware('auth')->group(function () {
  Route::patch('/rekap/{id}', [RekapController::class, 'update'])->name('rekap.update');
  Route::delete('/rekap/{id}', [RekapController::class, 'destroy'])->name('rekap.destroy');
 
- Route::get('/konsultasi', [RekapController::class, 'index'])->name('konsultasi.index');
- Route::get('/konsultasi/create', [RekapController::class, 'create'])->name('konsultasi.create');
- Route::post('/konsultasi', [RekapController::class, 'store'])->name('konsultasi.store');
- Route::get('/konsultasi/{id}/edit', [RekapController::class, 'edit'])->name('konsultasi.edit');
- Route::patch('/konsultasi/{id}', [RekapController::class, 'update'])->name('konsultasi.update');
- Route::delete('/konsultasi/{id}', [RekapController::class, 'destroy'])->name('konsultasi.destroy');
+ Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('konsultasi.index');
+ Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
+ Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
+ Route::get('/konsultasi/{id}/edit', [KonsultasiController::class, 'edit'])->name('konsultasi.edit');
+ Route::patch('/konsultasi/{id}', [KonsultasiController::class, 'update'])->name('konsultasi.update');
+ Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
 
 require __DIR__.'/auth.php';
