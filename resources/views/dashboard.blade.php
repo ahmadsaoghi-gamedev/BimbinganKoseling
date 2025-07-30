@@ -88,6 +88,23 @@
                 </div>
                 @endif
 
+                @if(auth()->user()->hasRole('gurubk'))
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-lg opacity-75 blur-lg group-hover:blur-none transition duration-500"></div>
+                    <a href="{{ route('gurubk.curhat') }}" class="relative block w-full h-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex flex-col justify-center items-center h-full p-4">
+                            <div class="mb-4 text-purple-500">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400">Daftar Curhat</h3>
+                            <p class="text-gray-700 dark:text-gray-300">Lihat curhat rahasia siswa</p>
+                        </div>
+                    </a>
+                </div>
+                @endif
+
                 @if(auth()->user()->hasRole('siswa') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))
                 <div class="relative group">
                     <div class="absolute inset-0 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg opacity-75 blur-lg group-hover:blur-none transition duration-500"></div>

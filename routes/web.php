@@ -13,6 +13,11 @@ use App\Models\Pengaduan;
 use Database\Seeders\GuruBkSeeder;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['auth', 'role:gurubk'])->group(function () {
+    Route::get('/gurubk/curhat', [\App\Http\Controllers\GuruBkController::class, 'listCurhat'])->name('gurubk.curhat');
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

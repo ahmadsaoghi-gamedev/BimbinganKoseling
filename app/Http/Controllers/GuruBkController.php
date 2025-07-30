@@ -17,6 +17,13 @@ class GuruBkController extends Controller
         return view('guru_bk.index', compact('guru_bk'));
     }
 
+    // Menampilkan daftar curhat rahasia untuk Guru BK
+    public function listCurhat()
+    {
+        $curhats = \App\Models\Konsultasi::with('user')->orderBy('created_at', 'desc')->get();
+        return view('guru_bk.curhat', compact('curhats'));
+    }
+
     // Menampilkan form tambah akun siswa
     public function create()
     {
