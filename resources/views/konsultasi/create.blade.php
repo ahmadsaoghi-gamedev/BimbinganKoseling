@@ -20,9 +20,13 @@
                             <x-input-error class="mt-2" :messages="$errors->get('isi_curhat')" />
                         </div>
                         
-                        <div class="mt-6 flex items-center justify-end gap-x-4">
-                           <a href="{{ route('dashboard') }}" class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200 hover:underline">Batal</a>
-                           <x-primary-button type="submit">Kirim Curhat</x-primary-button>
+                        <div class="mt-8 flex items-center justify-between">
+                           <a href="{{ route('dashboard') }}" class="px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-200">
+                               Batal
+                           </a>
+                           <x-primary-button type="submit" class="px-8 py-3 text-sm font-semibold">
+                               Kirim Curhat
+                           </x-primary-button>
                         </div>
                     </form>
                 </div>

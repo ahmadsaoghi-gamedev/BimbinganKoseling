@@ -18,7 +18,11 @@ class SiswaSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'siswa','guard_name' => 'web',]);      
+        // Check if role exists before creating
+        if (!Role::where('name', 'siswa')->exists()) {
+            Role::create(['name' => 'siswa','guard_name' => 'web',]);
+        }
+        
         $data = [
             [
             'nis' => '56790',

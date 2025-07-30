@@ -144,26 +144,77 @@
     </div>
 </x-app-layout>
 
-<x-modal name="pilihan" focusable maxWidth="xl">
-    <div class="p-6">
-        <!-- Judul Modal -->
-        <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
-            {{ __('Pengaduan & Bimbingan KOnseling') }}
-        </h2>
-
-        <a href="{{ route('pengaduan.index') }}" class="px-4 py-2 mr-5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
-            Pengaduan
-        </a>
-        <a href="{{ route('rekap.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
-            Bimbingan Konseling
-        </a>
-
-        <div class="mt-6 flex justify-end">
-            <x-secondary-button x-on:click="$dispatch('close')">
-                {{ __('Close') }}
-            </x-secondary-button>
-
+<x-modal name="pilihan" focusable maxWidth="4xl">
+    <div class="p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+        <!-- Header dengan gradient -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Pilih Layanan Konseling
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Silakan pilih layanan yang Anda butuhkan</p>
+        </div>
         
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Pengaduan Card -->
+            <div class="group relative">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                <a href="{{ route('pengaduan.index') }}" class="relative block p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Pengaduan</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 text-center">Laporkan masalah atau keluhan yang Anda alami</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Bimbingan Konseling Card -->
+            <div class="group relative">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                <a href="{{ route('rekap.create') }}" class="relative block p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Bimbingan Konseling</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 text-center">Konsultasi langsung dengan Guru BK</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Curhat Rahasia Card -->
+            <div class="group relative">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                <a href="{{ route('konsultasi.create') }}" class="relative block p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl transform transition duration-300 hover:scale-105">
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Curhat Rahasia</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 text-center">Ceritakan masalah pribadi dengan aman dan rahasia</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer dengan tombol tutup yang lebih menarik -->
+        <div class="flex justify-center">
+            <button x-on:click="$dispatch('close')" 
+                    class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                <span class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Tutup
+                </span>
+            </button>
         </div>
     </div>
 </x-modal>
