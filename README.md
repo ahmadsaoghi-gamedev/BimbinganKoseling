@@ -1,66 +1,51 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Aplikasi Bimbingan Konseling SMKN Negeri 1 Cilaku
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Deskripsi Singkat
 
-## About Laravel
+Aplikasi ini merupakan sistem bimbingan konseling berbasis web yang dirancang untuk memfasilitasi komunikasi dan pengelolaan data antara siswa dan Guru Bimbingan Konseling (Guru BK) di SMKN Negeri 1 Cilaku. Aplikasi ini membantu siswa dalam menyampaikan pengaduan, curhat rahasia, dan mendapatkan bimbingan secara efektif dan terorganisir.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tujuan Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   Mempermudah siswa dalam menyampaikan pengaduan dan curhat rahasia kepada Guru BK.
+-   Memfasilitasi Guru BK dalam mengelola data siswa, pengaduan, dan hasil bimbingan.
+-   Memberikan notifikasi WhatsApp otomatis kepada Guru BK dan siswa terkait aktivitas pengaduan dan bimbingan menggunakan layanan API Fonnte.
+-   Menyediakan dashboard yang mudah digunakan untuk semua pengguna sesuai peran (siswa, Guru BK, admin).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fitur Utama
 
-## Learning Laravel
+-   **Pengaduan Siswa:** Siswa dapat membuat laporan pengaduan yang akan diteruskan ke Guru BK.
+-   **Curhat Rahasia:** Siswa dapat mengirimkan curhat rahasia yang hanya dapat dilihat oleh Guru BK.
+-   **Daftar Curhat:** Guru BK dapat melihat daftar curhat rahasia siswa lengkap dengan status baca.
+-   **Rekap Bimbingan:** Guru BK dapat mencatat dan mengelola hasil bimbingan dengan siswa.
+-   **Manajemen Data:** Admin dapat mengelola data siswa, Guru BK, dan pelanggaran.
+-   **Notifikasi WhatsApp:** Integrasi dengan API Fonnte untuk mengirim notifikasi otomatis saat pengaduan baru dibuat dan saat Guru BK memberikan balasan.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Teknologi yang Digunakan
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-   Laravel Framework (PHP)
+-   Tailwind CSS untuk styling
+-   SQLite sebagai database (dapat disesuaikan)
+-   API Fonnte untuk notifikasi WhatsApp
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Cara Penggunaan
 
-## Laravel Sponsors
+1. **Instalasi:** Clone repository dan jalankan `composer install`.
+2. **Konfigurasi:** Salin `.env.example` menjadi `.env` dan isi variabel `FONNTE_API_TOKEN` dengan token API Fonnte Anda.
+3. **Migrasi dan Seed:** Jalankan migrasi dan seed database dengan `php artisan migrate --seed`.
+4. **Jalankan Server:** Gunakan `php artisan serve` untuk menjalankan aplikasi.
+5. **Akses Aplikasi:** Login sebagai siswa, Guru BK, atau admin sesuai akun yang tersedia.
+6. **Gunakan Fitur:** Siswa dapat membuat pengaduan dan curhat rahasia, Guru BK dapat melihat dan membalas curhat, serta mengelola data.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Catatan Penting
 
-### Premium Partners
+-   Pastikan variabel `FONNTE_API_TOKEN` sudah diatur di file `.env` agar notifikasi WhatsApp dapat berfungsi.
+-   Hak akses diatur berdasarkan peran pengguna untuk menjaga keamanan data.
+-   Fitur curhat rahasia menjaga privasi siswa dengan hanya dapat diakses oleh Guru BK.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Kontak
 
-## Contributing
+Untuk pertanyaan atau bantuan lebih lanjut, silakan hubungi tim pengembang aplikasi.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Dokumentasi ini memberikan gambaran singkat dan penting agar pengguna dan pengembang memahami tujuan dan fungsi utama aplikasi bimbingan konseling ini.
