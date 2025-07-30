@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_siswa');
-            $table->string('jenis_konsultasi', 50);
-            $table->date('tgl_konsultasi');
-            $table->string('topik', 255);
+            $table->text('isi_curhat');
+            $table->timestamp('tgl_curhat');
+            $table->enum('status_baca', ['belum dibaca', 'sudah dibaca'])->default('belum dibaca');
             $table->timestamps();
 
             // Foreign key constraint
-            $table->foreign('id_siswa')->references('id')->on('siswa')->onDelete('cascade');
+            $table->foreign('id_siswa')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

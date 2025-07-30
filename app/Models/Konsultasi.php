@@ -15,17 +15,17 @@ class Konsultasi extends Model
 
     protected $fillable = [
         'id_siswa',
-        'jenis_konsultasi',
-        'tgl_konsultasi',
-        'topik',
+        'isi_curhat',
+        'tgl_curhat',
+        'status_baca',
     ];
 
     protected $casts = [
-        'tgl_konsultasi' => 'date',
+        'tgl_curhat' => 'datetime',
     ];
 
-    public function siswa(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Siswa::class, 'id_siswa', 'id');
+        return $this->belongsTo(User::class, 'id_siswa', 'id');
     }
 }
