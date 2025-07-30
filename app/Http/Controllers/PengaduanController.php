@@ -7,6 +7,8 @@ use App\Models\Pengaduan;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PengaduanController extends Controller
 {
@@ -45,6 +47,27 @@ class PengaduanController extends Controller
             'laporan_pengaduan' => $validate['laporan_pengaduan'],
 
         ]);
+
+        // WhatsApp Notification Logic for New Complaint
+        try {
+            // Placeholder phone number for Guru BK (can be made dynamic later)
+            $guruBkPhoneNumber = '081234567890';
+            
+            // Create dynamic message
+            $pesan = "Notifikasi Pengaduan Baru: Siswa dengan NIS {$Pengaduan->nis} telah mengirimkan laporan pengaduan. Mohon untuk segera ditindaklanjuti.";
+            
+            // Send WhatsApp notification via Fonnte API
+            $response = Http::withHeaders([
+                'Authorization' => env('FONNTE_API_TOKEN')
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $guruBkPhoneNumber,
+                'message' => $pesan
+            ]);
+            
+        } catch (\Exception $e) {
+            // Log error if WhatsApp notification fails
+            Log::error('Gagal mengirim notifikasi WhatsApp untuk pengaduan baru: ' . $e->getMessage());
+        }
 
         $notification = [
             'message' => 'Data berhasil disimpan',

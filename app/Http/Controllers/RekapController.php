@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class RekapController extends Controller
 {
@@ -68,6 +70,30 @@ class RekapController extends Controller
     $rekap->update([
         'balasan' => $validated['balasan'],
     ]);
+
+    // WhatsApp Notification Logic for Guru BK Reply
+    try {
+        // Get student data from related Siswa model
+        $siswa = $rekap->siswa;
+        
+        // Check if student data and phone number exist
+        if ($siswa && $siswa->no_tlp) {
+            // Create personalized message for student
+            $pesan = "Info Bimbingan: Halo {$siswa->nama}, Guru BK telah memberikan balasan untuk sesi bimbingan Anda tanggal {$rekap->tgl_bimbingan}. Silakan periksa aplikasi untuk melihat detailnya.";
+            
+            // Send WhatsApp notification via Fonnte API
+            $response = Http::withHeaders([
+                'Authorization' => env('FONNTE_API_TOKEN')
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $siswa->no_tlp,
+                'message' => $pesan
+            ]);
+        }
+        
+    } catch (\Exception $e) {
+        // Log error if WhatsApp notification fails
+        Log::error('Gagal mengirim notifikasi WhatsApp untuk balasan bimbingan: ' . $e->getMessage());
+    }
 
     // Berikan notifikasi keberhasilan
     $notification = [
