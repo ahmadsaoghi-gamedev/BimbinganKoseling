@@ -1,8 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Daftar Curhat Rahasia') }}
-        </h2>
+        <div class="bg-red-800 text-white py-4 -mx-4 -mt-6 mb-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-2xl font-bold">CURHAT RAHASIA</h1>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -14,77 +16,69 @@
                             <p class="text-gray-500 dark:text-gray-400">Tidak ada curhat rahasia saat ini.</p>
                         </div>
                     @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Nama Siswa
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Isi Curhat
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Tanggal
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    @foreach($curhats as $curhat)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {{ $curhat->user->name ?? 'N/A' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
-                                            {{ Str::limit($curhat->isi_curhat ?? '', 100) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $curhat->created_at->format('d-m-Y H:i') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($curhat->status_baca ?? false)
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                                                    Sudah Dibaca
-                                                </span>
-                                            @else
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
-                                                    Belum Dibaca
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button 
-                                                x-data=""
-                                                x-on:click.prevent="$dispatch('open-modal', 'detail-curhat-{{ $curhat->id }}')"
-                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-                                            >
-                                                Lihat Detail
-                                            </button>
-                                        </td>
-                                    </tr>
+                        <div class="space-y-4">
+                            @foreach($curhats as $curhat)
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                                            {{ $curhat->user->name ?? 'Anonim' }}
+                                        </h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $curhat->created_at->format('d M Y, H:i') }}
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        @if($curhat->status_baca == 'sudah dibaca')
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                                Sudah Dibaca
+                                            </span>
+                                        @else
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                Belum Dibaca
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
+                                    <p class="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{{ $curhat->isi_curhat }}</p>
+                                </div>
 
-                                    <x-modal name="detail-curhat-{{ $curhat->id }}" focusable>
-                                        <div class="p-6">
-                                            <h3 class="text-lg font-semibold mb-4">Detail Curhat dari {{ $curhat->user->name ?? 'N/A' }}</h3>
-                                            <p class="whitespace-pre-wrap">{{ $curhat->isi_curhat ?? '' }}</p>
-                                            <div class="mt-4 text-right">
-                                                <button x-on:click="$dispatch('close')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Tutup</button>
-                                            </div>
-                                        </div>
-                                    </x-modal>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                @if($curhat->attachment)
+                                <div class="mb-4">
+                                    <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <i class="fas fa-paperclip"></i>
+                                        <span>Lampiran:</span>
+                                        <a href="{{ asset('storage/' . $curhat->attachment) }}" 
+                                           target="_blank" 
+                                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                                            {{ basename($curhat->attachment) }}
+                                        </a>
+                                    </div>
+                                </div>
+                                @endif
+
+                                <div class="flex justify-end">
+                                    @if($curhat->status_baca == 'belum dibaca')
+                                    <form action="{{ route('gurubk.curhat.mark-read', $curhat->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                            Tandai Sudah Dibaca
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </x-app-layout>

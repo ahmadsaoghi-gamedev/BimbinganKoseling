@@ -18,6 +18,7 @@ class Konsultasi extends Model
         'isi_curhat',
         'tgl_curhat',
         'status_baca',
+        'attachment',
     ];
 
     protected $casts = [

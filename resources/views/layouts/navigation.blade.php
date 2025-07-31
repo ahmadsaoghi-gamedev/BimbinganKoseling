@@ -17,31 +17,53 @@
                         {{ __('Beranda') }}
                     </x-nav-link>
                 </div>
+                
+                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk') || auth()->user()->hasRole('kepsek') || auth()->user()->hasRole('kajur'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('siswa.index')" :active="request()->routeIs('siswa.index')">
-                        {{ __('Data Siswa') }}
+                        {{ __('Data') }}
                     </x-nav-link>
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('guru_bk.index')" :active="request()->routeIs('guru_bk.index')">
-                        {{ __('Data Guru BK') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('pelanggaran.index')" :active="request()->routeIs('pelanggaran.index')">
-                        {{ __('Data Pelanggaran') }}
-                    </x-nav-link>
-                </div>
-                @if(auth()->user()->hasRole('kepsek') || auth()->user()->hasRole('kajur'))
-                @else
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('rekap.index')" :active="request()->routeIs('rekap.index')">
-                        {{ __('Rekap Bimbingan') }}
-                    </x-nav-link>
-                </div>
+                @endif
+                
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.index')">
-                        {{ __('Pengaduan & Bimbingan Konseling') }}
+                        {{ __('Bimbingan Konseling') }}
+                    </x-nav-link>
+                </div>
+                
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link href="#" :active="false">
+                        {{ __('Daftar Cek Masalah') }}
+                    </x-nav-link>
+                </div>
+                
+                @if(auth()->user()->hasRole('siswa'))
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('konsultasi.create')" :active="request()->routeIs('konsultasi.create')">
+                        {{ __('Curhat Rahasia') }}
+                    </x-nav-link>
+                </div>
+                @endif
+                
+                @if(auth()->user()->hasRole('gurubk'))
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('gurubk.curhat')" :active="request()->routeIs('gurubk.curhat')">
+                        {{ __('Curhat Rahasia') }}
+                    </x-nav-link>
+                </div>
+                @endif
+                
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.index')">
+                        {{ __('Pengaduan') }}
+                    </x-nav-link>
+                </div>
+                
+                @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk') || auth()->user()->hasRole('kepsek') || auth()->user()->hasRole('kajur'))
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('siswa.index')" :active="request()->routeIs('siswa.index')">
+                        {{ __('Siswa') }}
                     </x-nav-link>
                 </div>
                 @endif

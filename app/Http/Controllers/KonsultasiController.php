@@ -19,13 +19,24 @@ class KonsultasiController extends Controller
     {
         $request->validate([
             'isi_curhat' => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120', // Max 5MB
         ]);
+
+        $attachmentPath = null;
+        
+        // Handle file upload
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $attachmentPath = $file->storeAs('konsultasi_attachments', $fileName, 'public');
+        }
 
         Konsultasi::create([
             'id_siswa' => Auth::user()->id,
             'isi_curhat' => $request->isi_curhat,
             'tgl_curhat' => now(),
             'status_baca' => 'belum dibaca',
+            'attachment' => $attachmentPath,
         ]);
 
         try {
@@ -41,6 +52,6 @@ class KonsultasiController extends Controller
         }
 
         $notification = ['message' => 'Curhat rahasia berhasil dikirim!', 'alert-type' => 'success'];
-        return redirect()->route('dashboard')->with($notification);
+        return redirect()->route('konsultasi.create')->with($notification);
     }
 }

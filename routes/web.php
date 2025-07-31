@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:gurubk'])->group(function () {
     Route::get('/gurubk/curhat', [\App\Http\Controllers\GuruBkController::class, 'listCurhat'])->name('gurubk.curhat');
+    Route::patch('/gurubk/curhat/{id}/mark-read', [\App\Http\Controllers\GuruBkController::class, 'markCurhatAsRead'])->name('gurubk.curhat.mark-read');
 });
 
 

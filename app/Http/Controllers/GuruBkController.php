@@ -24,6 +24,20 @@ class GuruBkController extends Controller
         return view('guru_bk.curhat', compact('curhats'));
     }
 
+    // Mark curhat as read
+    public function markCurhatAsRead($id)
+    {
+        $curhat = \App\Models\Konsultasi::findOrFail($id);
+        $curhat->update(['status_baca' => 'sudah dibaca']);
+
+        $notification = [
+            'message' => 'Curhat telah ditandai sebagai sudah dibaca',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.curhat')->with($notification);
+    }
+
     // Menampilkan form tambah akun siswa
     public function create()
     {
