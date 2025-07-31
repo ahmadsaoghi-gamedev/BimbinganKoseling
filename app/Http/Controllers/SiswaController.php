@@ -14,8 +14,31 @@ class SiswaController extends Controller
     // Menampilkan daftar akun siswa
     public function index()
     {
-        $siswa = Siswa::all();
+        $user = auth()->user();
+        
+        if ($user->hasRole('siswa')) {
+            // Siswa hanya bisa melihat data dirinya sendiri
+            $siswa = Siswa::where('id_user', $user->id)->get();
+        } else {
+            // Admin dan Guru BK bisa melihat semua data siswa
+            $siswa = Siswa::all();
+        }
+        
         return view('siswa.index', compact('siswa'));
+    }
+
+    // Menampilkan detail siswa
+    public function show($id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $user = auth()->user();
+        
+        // Validasi akses: siswa hanya bisa melihat data dirinya sendiri
+        if ($user->hasRole('siswa') && $siswa->id_user != $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke data siswa ini.');
+        }
+        
+        return view('siswa.show', compact('siswa'));
     }
 
     // Menampilkan form tambah akun siswa

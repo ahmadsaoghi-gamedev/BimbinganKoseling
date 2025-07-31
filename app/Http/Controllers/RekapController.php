@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class RekapController extends Controller
 {
+    // Tidak ada middleware khusus di controller ini
+    // Middleware diatur di routes/web.php
     public function index()
     {
         $data['rekap'] = Rekap::all();

@@ -82,7 +82,17 @@ class PengaduanController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $pengaduan = Pengaduan::findOrFail($id);
+        return view('pengaduan.show', compact('pengaduan'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $siswa = Siswa::all();
+        return view('pengaduan.create', compact('siswa'));
     }
 
     /**
@@ -90,7 +100,9 @@ class PengaduanController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $pengaduan = Pengaduan::findOrFail($id);
+        $siswa = Siswa::all();
+        return view('pengaduan.edit', compact('pengaduan', 'siswa'));
     }
 
     /**
@@ -98,7 +110,41 @@ class PengaduanController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validate = $request->validate([
+            "nis" => 'required|max:10',
+            "jenis_pengaduan" => 'required|max:50',
+            "gambar" => 'nullable|image',
+            "laporan_pengaduan" => 'required|max:255',
+            "tgl_pengaduan" => 'required|max:30',
+            "status" => 'nullable|in:pending,proses,selesai',
+            "tanggapan" => 'nullable|string',
+        ]);
+
+        $pengaduan = Pengaduan::findOrFail($id);
+
+        // Handle file upload if new image is provided
+        if ($request->hasFile('gambar')) {
+            // Delete old image if exists
+            if ($pengaduan->gambar && file_exists(storage_path('app/public/images/' . $pengaduan->gambar))) {
+                unlink(storage_path('app/public/images/' . $pengaduan->gambar));
+            }
+            
+            $filename = 'gambar' . time() . '.' . $request->file('gambar')->extension();
+            $path = $request->file('gambar')->storeAs('public/images', $filename);
+            $validate['gambar'] = $filename;
+        } else {
+            // Keep existing image
+            unset($validate['gambar']);
+        }
+
+        $pengaduan->update($validate);
+
+        $notification = [
+            'message' => 'Data pengaduan berhasil diperbarui',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('pengaduan.index')->with($notification);
     }
 
     /**

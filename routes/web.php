@@ -17,9 +17,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Data Siswa: Hanya admin & gurubk
+    // Data Siswa: Admin, gurubk, dan siswa
+    Route::middleware('role:admin|gurubk|siswa')->group(function () {
+        Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
+        Route::get('/siswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
+    });
+
+    // Data Siswa: CRUD operations hanya untuk admin & gurubk
     Route::middleware('role:admin|gurubk')->group(function () {
-        Route::resource('siswa', SiswaController::class);
+        Route::get('/siswa/create', [SiswaController::class, 'create'])->name('siswa.create');
+        Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
+        Route::get('/siswa/{siswa}/edit', [SiswaController::class, 'edit'])->name('siswa.edit');
+        Route::patch('/siswa/{siswa}', [SiswaController::class, 'update'])->name('siswa.update');
+        Route::delete('/siswa/{siswa}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
     });
 
     // Data Guru BK: Hanya admin
@@ -27,20 +37,80 @@ Route::middleware('auth')->group(function () {
         Route::resource('guru_bk', GuruBkController::class);
     });
 
-    // Bimbingan, Curhat, Pengaduan: Siswa (membuat) & Guru BK (mengelola)
-    Route::middleware('role:siswa')->group(function () {
+    // Routes untuk Bimbingan Konseling - Siswa dan Guru BK
+    Route::middleware('role:siswa|gurubk')->group(function () {
+        Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('konsultasi.index');
         Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
         Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
-        Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
-        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
+        Route::get('/konsultasi/{konsultasi}', [KonsultasiController::class, 'show'])->name('konsultasi.show');
+        Route::get('/siswa/konsultasi', [\App\Http\Controllers\SiswaConsultationController::class, 'index'])->name('siswa.konsultasi.index');
+        Route::post('/konsultasi/balas', [KonsultasiController::class, 'balas'])->name('konsultasi.balas');
     });
 
+    // Routes untuk Curhat Rahasia - Siswa dan Guru BK
+    Route::middleware('role:siswa|gurubk')->group(function () {
+        Route::get('/gurubk/curhat', [GuruBkController::class, 'listCurhat'])->name('gurubk.curhat');
+        Route::post('/gurubk/curhat/{id}/reply', [GuruBkController::class, 'replyToConsultation'])->name('gurubk.curhat.reply');
+    });
+
+    // Routes untuk Bimbingan Lanjutan - Siswa dan Guru BK
+    Route::middleware('role:siswa|gurubk')->group(function () {
+        Route::get('/bimbingan-lanjutan', [GuruBkController::class, 'bimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan');
+    });
+
+    // Routes untuk Daftar Cek Masalah - Siswa dan Guru BK
+    Route::middleware('role:siswa|gurubk')->group(function () {
+        Route::get('/daftar-cek-masalah', [GuruBkController::class, 'daftarCekMasalah'])->name('gurubk.daftar-cek-masalah');
+    });
+
+    // Routes untuk Pengaduan - Siswa, Admin dan Guru BK
+    Route::middleware('role:siswa|admin|gurubk')->group(function () {
+        Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');
+        Route::get('/pengaduan/{id}', [PengaduanController::class, 'show'])->name('pengaduan.show');
+        Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
+    });
+
+    // Routes khusus Guru BK - CRUD operations
     Route::middleware('role:gurubk')->group(function(){
-        Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('konsultasi.index');
-        Route::get('/konsultasi/{konsultasi}', [KonsultasiController::class, 'show'])->name('konsultasi.show');
-        Route::post('/konsultasi/balas', [KonsultasiController::class, 'balas'])->name('konsultasi.balas');
-        Route::resource('rekap', RekapController::class)->except(['create']);
-        Route::resource('pengaduan', PengaduanController::class)->except(['store']);
+        // Curhat Rahasia - Management
+        Route::patch('/gurubk/curhat/{id}/mark-read', [GuruBkController::class, 'markCurhatAsRead'])->name('gurubk.curhat.mark-read');
+        
+        // Bimbingan Lanjutan - Management
+        Route::get('/bimbingan-lanjutan/create', [GuruBkController::class, 'createBimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan.create');
+        Route::post('/bimbingan-lanjutan', [GuruBkController::class, 'storeBimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan.store');
+        Route::get('/bimbingan-lanjutan/{id}/edit', [GuruBkController::class, 'editBimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan.edit');
+        Route::patch('/bimbingan-lanjutan/{id}', [GuruBkController::class, 'updateBimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan.update');
+        Route::delete('/bimbingan-lanjutan/{id}', [GuruBkController::class, 'destroyBimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan.destroy');
+        
+        // Daftar Cek Masalah - Management
+        Route::post('/daftar-cek-masalah', [GuruBkController::class, 'storeCekMasalah'])->name('gurubk.daftar-cek-masalah.store');
+    });
+
+    // Routes khusus Admin dan Guru BK - Pengaduan Management
+    Route::middleware('role:admin|gurubk')->group(function(){
+        Route::get('/pengaduan/create', [PengaduanController::class, 'create'])->name('pengaduan.create');
+        Route::get('/pengaduan/{id}/edit', [PengaduanController::class, 'edit'])->name('pengaduan.edit');
+        Route::patch('/pengaduan/{id}', [PengaduanController::class, 'update'])->name('pengaduan.update');
+        Route::delete('/pengaduan/{id}', [PengaduanController::class, 'destroy'])->name('pengaduan.destroy');
+    });
+
+    // Route untuk Rekap - Akses berdasarkan role
+    Route::middleware('role:gurubk|siswa')->group(function(){
+        Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index');
+    });
+    
+    Route::middleware('role:gurubk')->group(function(){
+        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
+        Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
+        Route::get('/rekap/{rekap}/edit', [RekapController::class, 'edit'])->name('rekap.edit');
+        Route::patch('/rekap/{rekap}', [RekapController::class, 'update'])->name('rekap.update');
+        Route::delete('/rekap/{rekap}', [RekapController::class, 'destroy'])->name('rekap.destroy');
+    });
+
+    // Route untuk siswa - hanya create dan view rekap
+    Route::middleware('role:siswa')->group(function(){
+        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
+        Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
     });
 
     // Data Pelanggaran: Kesiswaan (CRUD Lengkap) & Lainnya (hanya lihat)

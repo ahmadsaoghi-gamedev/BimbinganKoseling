@@ -26,36 +26,30 @@
                 </div>
                 @endif
                 
+                <!-- Bimbingan Konseling - Accessible by both siswa and gurubk -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.index')">
+                    <x-nav-link :href="route('konsultasi.index')" :active="request()->routeIs('konsultasi.*')">
                         {{ __('Bimbingan Konseling') }}
                     </x-nav-link>
                 </div>
                 
+                <!-- Daftar Cek Masalah - Accessible by both siswa and gurubk -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('gurubk.daftar-cek-masalah')" :active="request()->routeIs('gurubk.daftar-cek-masalah')">
                         {{ __('Daftar Cek Masalah') }}
                     </x-nav-link>
                 </div>
                 
-                @if(auth()->user()->hasRole('siswa'))
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('konsultasi.index')" :active="request()->routeIs('konsultasi.*')">
-                        {{ __('Curhat Rahasia') }}
-                    </x-nav-link>
-                </div>
-                @endif
-                
-                @if(auth()->user()->hasRole('gurubk'))
+                <!-- Curhat Rahasia - Accessible by both siswa and gurubk -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('gurubk.curhat')" :active="request()->routeIs('gurubk.curhat')">
                         {{ __('Curhat Rahasia') }}
                     </x-nav-link>
                 </div>
-                @endif
                 
+                <!-- Pengaduan - Accessible by both siswa and gurubk -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.index')">
+                    <x-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.*')">
                         {{ __('Pengaduan') }}
                     </x-nav-link>
                 </div>
@@ -124,7 +118,23 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Beranda') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('konsultasi.index')" :active="request()->routeIs('konsultasi.*')">
+                {{ __('Bimbingan Konseling') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('gurubk.daftar-cek-masalah')" :active="request()->routeIs('gurubk.daftar-cek-masalah')">
+                {{ __('Daftar Cek Masalah') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('gurubk.curhat')" :active="request()->routeIs('gurubk.curhat')">
+                {{ __('Curhat Rahasia') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('pengaduan.index')" :active="request()->routeIs('pengaduan.*')">
+                {{ __('Pengaduan') }}
             </x-responsive-nav-link>
         </div>
 

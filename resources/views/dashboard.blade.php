@@ -103,6 +103,36 @@
                         </div>
                     </a>
                 </div>
+
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg opacity-75 blur-lg group-hover:blur-none transition duration-500"></div>
+                    <a href="{{ route('gurubk.bimbingan-lanjutan') }}" class="relative block w-full h-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex flex-col justify-center items-center h-full p-4">
+                            <div class="mb-4 text-orange-500">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-orange-600 dark:text-orange-400">Bimbingan Lanjutan</h3>
+                            <p class="text-gray-700 dark:text-gray-300">Kelola bimbingan lanjutan siswa</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg opacity-75 blur-lg group-hover:blur-none transition duration-500"></div>
+                    <a href="{{ route('gurubk.daftar-cek-masalah') }}" class="relative block w-full h-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
+                        <div class="flex flex-col justify-center items-center h-full p-4">
+                            <div class="mb-4 text-teal-500">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-teal-600 dark:text-teal-400">Daftar Cek Masalah</h3>
+                            <p class="text-gray-700 dark:text-gray-300">Identifikasi masalah siswa</p>
+                        </div>
+                    </a>
+                </div>
                 @endif
 
                 @if(auth()->user()->hasRole('siswa') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))

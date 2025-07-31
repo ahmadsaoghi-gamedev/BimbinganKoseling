@@ -23,49 +23,72 @@
         <!-- Red Header Section -->
         <div class="bg-red-800 text-white py-4">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-2xl font-bold">RIWAYAT CURHAT RAHASIA</h1>
+                <h1 class="text-2xl font-bold">BIMBINGAN KONSELING</h1>
+                @hasrole('siswa')
+                <p class="text-red-200 text-sm mt-1">Riwayat konsultasi dan komunikasi dengan Guru BK</p>
+                @else
+                <p class="text-red-200 text-sm mt-1">Kelola konsultasi siswa</p>
+                @endhasrole
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="py-8">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                @if($consultations->isEmpty())
+                @if($konsultasi->isEmpty())
                     <div class="bg-white rounded-lg shadow-sm p-8 text-center">
                         <i class="fas fa-comments text-gray-400 text-6xl mb-4"></i>
-                        <p class="text-gray-500 text-lg mb-4">Anda belum pernah mengirim curhat.</p>
+                        @hasrole('siswa')
+                        <p class="text-gray-500 text-lg mb-4">Anda belum pernah mengirim konsultasi.</p>
                         <a href="{{ route('konsultasi.create') }}" 
-                           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                            <i class="fas fa-plus mr-2"></i>
-                            Kirim Curhat Pertama
+                           class="inline-flex items-center px-8 py-4 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out focus:outline-none"
+                           style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%); border: 2px solid #7f1d1d;">
+                            <i class="fas fa-plus mr-3 text-xl" style="color: white;"></i>
+                            <span class="font-bold" style="color: white;">Kirim Konsultasi Pertama</span>
                         </a>
+                        @else
+                        <p class="text-gray-500 text-lg">Tidak ada konsultasi saat ini.</p>
+                        @endhasrole
                     </div>
                 @else
                     <div class="space-y-6">
-                        @foreach($consultations as $consultation)
+                        @foreach($konsultasi as $item)
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                             <!-- Header Card -->
-                            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
                                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                                             <i class="fas fa-user text-white"></i>
                                         </div>
                                         <div>
-                                            <h3 class="font-semibold text-gray-900">Curhat Anda</h3>
-                                            <p class="text-sm text-gray-500">{{ $consultation->created_at->format('d M Y, H:i') }}</p>
+                                            <h3 class="font-semibold text-gray-900">{{ $item->user->name ?? 'N/A' }}</h3>
+                                            <p class="text-sm text-gray-500">{{ $item->created_at->format('d M Y, H:i') }}</p>
                                         </div>
                                     </div>
                                     <div>
-                                        @if($consultation->reply_guru)
+                                        @php
+                                            $hasConversations = $item->conversations->count() > 0;
+                                        @endphp
+                                        
+                                        @if($hasConversations)
+                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                <i class="fas fa-comments mr-1"></i>
+                                                Dalam Percakapan
+                                            </span>
+                                        @elseif($item->reply_guru)
                                             <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                                                 <i class="fas fa-check-circle mr-1"></i>
-                                                Ada Balasan
+                                                Sudah Dibalas
                                             </span>
                                         @else
                                             <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                 <i class="fas fa-clock mr-1"></i>
+                                                @hasrole('siswa')
                                                 Menunggu Balasan
+                                                @else
+                                                Belum Dibalas
+                                                @endhasrole
                                             </span>
                                         @endif
                                     </div>
@@ -74,7 +97,7 @@
 
                             <!-- Content -->
                             <div class="p-6">
-                                <!-- Your Message -->
+                                <!-- Original Message -->
                                 <div class="mb-6">
                                     <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
                                         <div class="flex items-start space-x-3">
@@ -83,12 +106,13 @@
                                             </div>
                                             <div class="flex-1">
                                                 <div class="flex items-center justify-between mb-2">
-                                                    <span class="text-sm font-medium text-blue-800">Pesan Anda</span>
+                                                    <span class="text-sm font-medium text-blue-800">Pesan Awal - {{ $item->user->name }}</span>
+                                                    <span class="text-xs text-blue-600">{{ $item->created_at->format('d M Y, H:i') }}</span>
                                                 </div>
-                                                <p class="text-gray-800 leading-relaxed">{{ $consultation->isi_curhat }}</p>
-                                                @if($consultation->attachment)
+                                                <p class="text-gray-800 leading-relaxed">{{ $item->isi_curhat }}</p>
+                                                @if($item->attachment)
                                                     <div class="mt-3">
-                                                        <a href="{{ asset('storage/' . $consultation->attachment) }}" 
+                                                        <a href="{{ asset('storage/' . $item->attachment) }}" 
                                                            target="_blank" 
                                                            class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200">
                                                             <i class="fas fa-paperclip mr-2"></i>
@@ -101,9 +125,51 @@
                                     </div>
                                 </div>
 
-                                <!-- Teacher Reply -->
-                                @if($consultation->reply_guru)
-                                    <div class="mb-6">
+                                <!-- Conversations -->
+                                @if($item->conversations->count() > 0)
+                                    <div class="space-y-4 mb-6">
+                                        @foreach($item->conversations as $conversation)
+                                            <div class="@if($conversation->sender_type == 'gurubk') ml-8 @else mr-8 @endif">
+                                                <div class="@if($conversation->sender_type == 'gurubk') bg-green-50 border-l-4 border-green-500 @else bg-gray-50 border-l-4 border-gray-500 @endif rounded-lg p-4">
+                                                    <div class="flex items-start space-x-3">
+                                                        <div class="w-8 h-8 @if($conversation->sender_type == 'gurubk') bg-green-500 @else bg-gray-500 @endif rounded-full flex items-center justify-center flex-shrink-0">
+                                                            <i class="fas @if($conversation->sender_type == 'gurubk') fa-user-tie @else fa-user @endif text-white text-sm"></i>
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <div class="flex items-center justify-between mb-2">
+                                                                <span class="text-sm font-medium @if($conversation->sender_type == 'gurubk') text-green-800 @else text-gray-800 @endif">
+                                                                    @if($conversation->sender_type == 'gurubk')
+                                                                        Guru BK
+                                                                    @else
+                                                                        {{ $conversation->sender->name }}
+                                                                    @endif
+                                                                </span>
+                                                                <span class="text-xs @if($conversation->sender_type == 'gurubk') text-green-600 @else text-gray-600 @endif">
+                                                                    {{ $conversation->created_at->format('d M Y, H:i') }}
+                                                                </span>
+                                                            </div>
+                                                            <p class="text-gray-800 leading-relaxed">{{ $conversation->message }}</p>
+                                                            @if($conversation->attachment)
+                                                                <div class="mt-3">
+                                                                    <a href="{{ asset('storage/' . $conversation->attachment) }}" 
+                                                                       target="_blank" 
+                                                                       class="inline-flex items-center px-3 py-2 @if($conversation->sender_type == 'gurubk') bg-green-100 text-green-700 hover:bg-green-200 @else bg-gray-100 text-gray-700 hover:bg-gray-200 @endif rounded-lg transition-colors duration-200">
+                                                                        <i class="fas fa-paperclip mr-2"></i>
+                                                                        Lihat Lampiran
+                                                                    </a>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Legacy Reply (jika ada) -->
+                                @if($item->reply_guru && $item->conversations->count() == 0)
+                                    <div class="mb-6 ml-8">
                                         <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
                                             <div class="flex items-start space-x-3">
                                                 <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -112,32 +178,84 @@
                                                 <div class="flex-1">
                                                     <div class="flex items-center justify-between mb-2">
                                                         <span class="text-sm font-medium text-green-800">Balasan Guru BK</span>
-                                                        <span class="text-xs text-green-600">{{ $consultation->reply_date->format('d M Y, H:i') }}</span>
+                                                        <span class="text-xs text-green-600">{{ $item->reply_date->format('d M Y, H:i') }}</span>
                                                     </div>
-                                                    <p class="text-gray-800 leading-relaxed">{{ $consultation->reply_guru }}</p>
+                                                    <p class="text-gray-800 leading-relaxed">{{ $item->reply_guru }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                @else
-                                    <div class="text-center py-6 border-t border-gray-200">
-                                        <i class="fas fa-hourglass-half text-gray-400 text-3xl mb-2"></i>
-                                        <p class="text-gray-500">Guru BK sedang memproses curhat Anda. Mohon tunggu balasan.</p>
-                                    </div>
                                 @endif
+
+                                <!-- Reply Form -->
+                                <div class="border-t border-gray-200 pt-6">
+                                    <form action="{{ route('konsultasi.balas') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="hidden" name="konsultasi_id" value="{{ $item->id }}">
+                                        
+                                        <div class="mb-4">
+                                            <label for="message_{{ $item->id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                                <i class="fas fa-reply mr-2 text-blue-500"></i>
+                                                @hasrole('siswa')
+                                                Balas Pesan
+                                                @else
+                                                Tulis Balasan Anda
+                                                @endhasrole
+                                            </label>
+                                            <textarea 
+                                                id="message_{{ $item->id }}" 
+                                                name="message" 
+                                                rows="4" 
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
+                                                placeholder="@hasrole('siswa')Ketik balasan Anda...@elseKetik balasan Anda untuk siswa...@endhasrole"
+                                                required
+                                            ></textarea>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label for="attachment_{{ $item->id }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                                <i class="fas fa-paperclip mr-2 text-gray-500"></i>
+                                                Lampiran (Opsional)
+                                            </label>
+                                            <input 
+                                                type="file" 
+                                                id="attachment_{{ $item->id }}" 
+                                                name="attachment" 
+                                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, PDF, DOC, DOCX. Maksimal 2MB.</p>
+                                        </div>
+                                        
+                                        <div class="flex justify-end mt-3">
+                                            <button 
+                                                type="submit" 
+                                                class="inline-flex items-center px-6 py-3 bg-red-800 hover:bg-red-900 text-white font-semibold text-sm rounded-lg border border-red-900 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50"
+                                            >
+                                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                                                </svg>
+                                                <span class="font-semibold">Kirim Pesan</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         @endforeach
                     </div>
 
                     <!-- Add New Consultation Button -->
+                    @hasrole('siswa')
                     <div class="mt-8 text-center">
                         <a href="{{ route('konsultasi.create') }}" 
-                           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                            <i class="fas fa-plus mr-2"></i>
-                            Kirim Curhat Baru
+                           class="inline-flex items-center px-8 py-4 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out focus:outline-none"
+                           style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%); border: 2px solid #7f1d1d;">
+                            <i class="fas fa-plus mr-3 text-xl" style="color: white;"></i>
+                            <span class="font-bold" style="color: white;">Kirim Konsultasi Baru</span>
                         </a>
                     </div>
+                    @endhasrole
                 @endif
             </div>
         </div>

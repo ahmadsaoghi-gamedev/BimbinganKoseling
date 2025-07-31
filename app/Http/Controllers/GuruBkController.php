@@ -17,29 +17,68 @@ class GuruBkController extends Controller
         return view('guru_bk.index', compact('guru_bk'));
     }
 
-    // Menampilkan daftar curhat rahasia untuk Guru BK
+    // Menampilkan daftar curhat rahasia untuk Guru BK dan Siswa
     public function listCurhat()
     {
-        $curhats = \App\Models\Konsultasi::with('user')->orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
+        
+        if ($user->hasRole('siswa')) {
+            // Siswa hanya bisa melihat curhat miliknya sendiri
+            $curhats = \App\Models\Konsultasi::with(['user', 'conversations.sender'])
+                ->where('id_siswa', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            // Guru BK bisa melihat semua curhat
+            $curhats = \App\Models\Konsultasi::with(['user', 'conversations.sender'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        
         return view('guru_bk.curhat', compact('curhats'));
     }
 
-    // Menyimpan balasan guru BK
+    // Menyimpan balasan guru BK atau siswa (komunikasi dua arah)
     public function replyToConsultation(Request $request, $id)
     {
         $request->validate([
-            'reply_guru' => 'required|string|min:10',
+            'message' => 'required|string|min:5',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
         ]);
 
         $konsultasi = \App\Models\Konsultasi::findOrFail($id);
+        $user = auth()->user();
+        
+        // Tentukan sender_type berdasarkan role user
+        $senderType = $user->hasRole('gurubk') ? 'gurubk' : 'siswa';
+        
+        // Validasi akses: siswa hanya bisa reply ke curhat miliknya sendiri
+        if ($user->hasRole('siswa') && $konsultasi->id_siswa != $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke curhat ini.');
+        }
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('curhat_attachments', 'public');
+        }
+
+        // Simpan pesan ke tabel conversations
+        \App\Models\CurhatConversation::create([
+            'konsultasi_id' => $konsultasi->id,
+            'sender_id' => $user->id,
+            'sender_type' => $senderType,
+            'message' => $request->message,
+            'attachment' => $attachmentPath,
+            'is_read' => false,
+        ]);
+
+        // Update status konsultasi
         $konsultasi->update([
-            'reply_guru' => $request->reply_guru,
-            'reply_date' => now(),
-            'status_baca' => 'sudah dibaca',
+            'status_baca' => 'dalam percakapan',
         ]);
 
         $notification = [
-            'message' => 'Balasan berhasil dikirim!',
+            'message' => 'Pesan berhasil dikirim!',
             'alert-type' => 'success'
         ];
 
@@ -160,5 +199,197 @@ class GuruBkController extends Controller
         );
 
         return redirect()->route('guru_bk.index')->with('success', 'Data Guru Berhasil Ditambahkan');
+    }
+
+    // ===== FITUR BIMBINGAN LANJUTAN =====
+    
+    public function bimbinganLanjutan()
+    {
+        $user = auth()->user();
+        
+        if ($user->hasRole('siswa')) {
+            // Siswa hanya bisa melihat bimbingan lanjutan yang terkait dengan dirinya
+            $siswa = \App\Models\Siswa::where('id_user', $user->id)->first();
+            if ($siswa) {
+                $bimbinganLanjutan = \App\Models\Rekap::where('jenis_bimbingan', 'lanjutan')
+                    ->where('id_siswa', $siswa->id)
+                    ->with('siswa')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            } else {
+                $bimbinganLanjutan = collect();
+            }
+        } else {
+            // Guru BK bisa melihat semua bimbingan lanjutan
+            $bimbinganLanjutan = \App\Models\Rekap::where('jenis_bimbingan', 'lanjutan')
+                ->with('siswa')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        
+        return view('guru_bk.bimbingan_lanjutan.index', compact('bimbinganLanjutan'));
+    }
+
+    public function createBimbinganLanjutan()
+    {
+        $siswa = \App\Models\Siswa::all();
+        return view('guru_bk.bimbingan_lanjutan.create', compact('siswa'));
+    }
+
+    public function storeBimbinganLanjutan(Request $request)
+    {
+        $request->validate([
+            'id_siswa' => 'required|exists:siswa,id',
+            'masalah' => 'required|string|min:10',
+            'solusi' => 'required|string|min:10',
+            'tindak_lanjut' => 'required|string|min:10',
+            'tanggal_bimbingan' => 'required|date',
+        ]);
+
+        \App\Models\Rekap::create([
+            'id_siswa' => $request->id_siswa,
+            'masalah' => $request->masalah,
+            'solusi' => $request->solusi,
+            'tindak_lanjut' => $request->tindak_lanjut,
+            'tanggal_bimbingan' => $request->tanggal_bimbingan,
+            'jenis_bimbingan' => 'lanjutan',
+            'status' => 'selesai',
+        ]);
+
+        $notification = [
+            'message' => 'Bimbingan lanjutan berhasil ditambahkan!',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.bimbingan-lanjutan')->with($notification);
+    }
+
+    public function editBimbinganLanjutan($id)
+    {
+        $bimbingan = \App\Models\Rekap::findOrFail($id);
+        $siswa = \App\Models\Siswa::all();
+        return view('guru_bk.bimbingan_lanjutan.edit', compact('bimbingan', 'siswa'));
+    }
+
+    public function updateBimbinganLanjutan(Request $request, $id)
+    {
+        $request->validate([
+            'id_siswa' => 'required|exists:siswa,id',
+            'masalah' => 'required|string|min:10',
+            'solusi' => 'required|string|min:10',
+            'tindak_lanjut' => 'required|string|min:10',
+            'tanggal_bimbingan' => 'required|date',
+        ]);
+
+        $bimbingan = \App\Models\Rekap::findOrFail($id);
+        $bimbingan->update([
+            'id_siswa' => $request->id_siswa,
+            'masalah' => $request->masalah,
+            'solusi' => $request->solusi,
+            'tindak_lanjut' => $request->tindak_lanjut,
+            'tanggal_bimbingan' => $request->tanggal_bimbingan,
+        ]);
+
+        $notification = [
+            'message' => 'Bimbingan lanjutan berhasil diperbarui!',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.bimbingan-lanjutan')->with($notification);
+    }
+
+    public function destroyBimbinganLanjutan($id)
+    {
+        $bimbingan = \App\Models\Rekap::findOrFail($id);
+        $bimbingan->delete();
+
+        $notification = [
+            'message' => 'Bimbingan lanjutan berhasil dihapus!',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.bimbingan-lanjutan')->with($notification);
+    }
+
+    // ===== FITUR DAFTAR CEK MASALAH =====
+    
+    public function daftarCekMasalah()
+    {
+        $daftarMasalah = [
+            'akademik' => [
+                'Kesulitan memahami pelajaran',
+                'Nilai rendah',
+                'Tidak mengerjakan tugas',
+                'Sering terlambat mengumpulkan tugas',
+                'Kurang motivasi belajar'
+            ],
+            'sosial' => [
+                'Sulit bergaul dengan teman',
+                'Konflik dengan teman sekelas',
+                'Merasa dikucilkan',
+                'Kesulitan berkomunikasi',
+                'Pemalu berlebihan'
+            ],
+            'pribadi' => [
+                'Masalah keluarga',
+                'Masalah keuangan',
+                'Masalah kesehatan',
+                'Kurang percaya diri',
+                'Mudah marah/emosional'
+            ],
+            'karir' => [
+                'Bingung memilih jurusan',
+                'Tidak tahu minat dan bakat',
+                'Khawatir tentang masa depan',
+                'Kurang informasi dunia kerja',
+                'Tidak ada motivasi untuk melanjutkan studi'
+            ]
+        ];
+
+        $user = auth()->user();
+        
+        if ($user->hasRole('siswa')) {
+            // Siswa hanya bisa melihat data dirinya sendiri
+            $siswa = \App\Models\Siswa::where('id_user', $user->id)->get();
+        } else {
+            // Guru BK bisa melihat semua siswa
+            $siswa = \App\Models\Siswa::all();
+        }
+        
+        return view('guru_bk.daftar_cek_masalah.index', compact('daftarMasalah', 'siswa'));
+    }
+
+    public function storeCekMasalah(Request $request)
+    {
+        $request->validate([
+            'id_siswa' => 'required|exists:siswa,id',
+            'kategori_masalah' => 'required|string',
+            'masalah_terpilih' => 'required|array',
+            'masalah_lain' => 'nullable|string',
+            'tingkat_urgensi' => 'required|in:rendah,sedang,tinggi',
+            'catatan_guru' => 'nullable|string',
+        ]);
+
+        $masalahList = implode(', ', $request->masalah_terpilih);
+        if ($request->masalah_lain) {
+            $masalahList .= ', ' . $request->masalah_lain;
+        }
+
+        \App\Models\Rekap::create([
+            'id_siswa' => $request->id_siswa,
+            'masalah' => $masalahList,
+            'solusi' => 'Perlu ditindaklanjuti - ' . $request->tingkat_urgensi,
+            'tindak_lanjut' => $request->catatan_guru ?? 'Akan dijadwalkan sesi konseling',
+            'tanggal_bimbingan' => now(),
+            'jenis_bimbingan' => 'cek_masalah',
+            'status' => 'proses',
+        ]);
+
+        $notification = [
+            'message' => 'Daftar cek masalah berhasil disimpan!',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.daftar-cek-masalah')->with($notification);
     }
 }
