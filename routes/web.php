@@ -1,93 +1,56 @@
 <?php
-
-use App\Http\Controllers\OrangTuaController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RekapController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\GuruBkController;
-use App\Http\Controllers\PelanggaranController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RekapController;
 use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\PelanggaranController;
 use App\Http\Controllers\KonsultasiController;
-use App\Models\OrangTua;
-use App\Models\Pengaduan;
-use Database\Seeders\GuruBkSeeder;
-use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:gurubk'])->group(function () {
-    Route::get('/gurubk/curhat', [\App\Http\Controllers\GuruBkController::class, 'listCurhat'])->name('gurubk.curhat');
-    Route::patch('/gurubk/curhat/{id}/mark-read', [\App\Http\Controllers\GuruBkController::class, 'markCurhatAsRead'])->name('gurubk.curhat.mark-read');
-    Route::post('/gurubk/curhat/{id}/reply', [\App\Http\Controllers\GuruBkController::class, 'replyToConsultation'])->name('gurubk.curhat.reply');
-});
+Route::get('/', function () { return view('welcome'); });
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-Route::get('/', function () {
-    return view('auth.login');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () { return view('dashboard'); })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Data Siswa: Hanya admin & gurubk
+    Route::middleware('role:admin|gurubk')->group(function () {
+        Route::resource('siswa', SiswaController::class);
+    });
+
+    // Data Guru BK: Hanya admin
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('guru_bk', GuruBkController::class);
+    });
+
+    // Bimbingan, Curhat, Pengaduan: Siswa (membuat) & Guru BK (mengelola)
+    Route::middleware('role:siswa')->group(function () {
+        Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
+        Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
+        Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
+        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
+    });
+
+    Route::middleware('role:gurubk')->group(function(){
+        Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('konsultasi.index');
+        Route::get('/konsultasi/{konsultasi}', [KonsultasiController::class, 'show'])->name('konsultasi.show');
+        Route::post('/konsultasi/balas', [KonsultasiController::class, 'balas'])->name('konsultasi.balas');
+        Route::resource('rekap', RekapController::class)->except(['create']);
+        Route::resource('pengaduan', PengaduanController::class)->except(['store']);
+    });
+
+    // Data Pelanggaran: Kesiswaan (CRUD Lengkap) & Lainnya (hanya lihat)
+    Route::middleware('role:kesiswaan|gurubk|kepsek|orangtua|kajur|siswa')->group(function () {
+        Route::get('/pelanggaran', [PelanggaranController::class, 'index'])->name('pelanggaran.index');
+    });
+
+    Route::middleware('role:kesiswaan')->group(function () {
+        Route::resource('pelanggaran', PelanggaranController::class)->except(['index']);
+    });
 });
 
- Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
- Route::get('/siswa/create', [SiswaController::class, 'create'])->name('siswa.create');
- Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
- Route::get('/siswa/{id}/edit', [SiswaController::class, 'edit'])->name('siswa.edit');
- Route::patch('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update');
- Route::delete('/siswa/{id}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
-
- Route::get('/guru_bk', [GuruBkController::class, 'index'])->name('guru_bk.index');
- Route::get('/guru_bk/create', [GuruBkController::class, 'create'])->name('guru_bk.create');
- Route::post('/guru_bk', [GuruBkController::class, 'store'])->name('guru_bk.store');
- Route::get('/guru_bk/{id}/edit', [GuruBkController::class, 'edit'])->name('guru_bk.edit');
- Route::patch('/guru_bk/{id}', [GuruBkController::class, 'update'])->name('guru_bk.update');
- Route::delete('/guru_bk/{id}', [GuruBkController::class, 'destroy'])->name('guru_bk.destroy');
-
- Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');
- Route::get('/pengaduan/create', [PengaduanController::class, 'create'])->name('pengaduan.create');
- Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
- Route::get('/pengaduan/{id}/edit', [PengaduanController::class, 'edit'])->name('pengaduan.edit');
- Route::patch('/pengaduan/{id}', [PengaduanController::class, 'update'])->name('pengaduan.update');
- Route::delete('/pengaduan/{id}', [PengaduanController::class, 'destroy'])->name('pengaduan.destroy');
- 
- Route::get('/pelanggaran', [PelanggaranController::class, 'index'])->name('pelanggaran.index');
- Route::get('/pelanggaran/create', [PelanggaranController::class, 'create'])->name('pelanggaran.create');
- Route::post('/pelanggaran', [PelanggaranController::class, 'store'])->name('pelanggaran.store');
- Route::get('/pelanggaran/{id}/edit', [PelanggaranController::class, 'edit'])->name('pelanggaran.edit');
- Route::patch('/pelanggaran/{id}', [PelanggaranController::class, 'update'])->name('pelanggaran.update');
- Route::delete('/pelanggaran/{id}', [PelanggaranController::class, 'destroy'])->name('pelanggaran.destroy');
-
- Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index');
- Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
- Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
- Route::get('/rekap/edit/{id}', [RekapController::class, 'edit'])->name('rekap.edit');
- Route::patch('/rekap/{id}', [RekapController::class, 'update'])->name('rekap.update');
- Route::delete('/rekap/{id}', [RekapController::class, 'destroy'])->name('rekap.destroy');
-
-Route::middleware(['auth', 'role:siswa'])->group(function () {
-    Route::get('/konsultasi', [\App\Http\Controllers\SiswaConsultationController::class, 'index'])->name('konsultasi.index');
-    Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
-    Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
-});
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
