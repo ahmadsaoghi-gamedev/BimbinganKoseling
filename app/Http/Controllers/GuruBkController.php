@@ -24,6 +24,28 @@ class GuruBkController extends Controller
         return view('guru_bk.curhat', compact('curhats'));
     }
 
+    // Menyimpan balasan guru BK
+    public function replyToConsultation(Request $request, $id)
+    {
+        $request->validate([
+            'reply_guru' => 'required|string|min:10',
+        ]);
+
+        $konsultasi = \App\Models\Konsultasi::findOrFail($id);
+        $konsultasi->update([
+            'reply_guru' => $request->reply_guru,
+            'reply_date' => now(),
+            'status_baca' => 'sudah dibaca',
+        ]);
+
+        $notification = [
+            'message' => 'Balasan berhasil dikirim!',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->route('gurubk.curhat')->with($notification);
+    }
+
     // Mark curhat as read
     public function markCurhatAsRead($id)
     {

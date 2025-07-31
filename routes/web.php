@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'role:gurubk'])->group(function () {
     Route::get('/gurubk/curhat', [\App\Http\Controllers\GuruBkController::class, 'listCurhat'])->name('gurubk.curhat');
     Route::patch('/gurubk/curhat/{id}/mark-read', [\App\Http\Controllers\GuruBkController::class, 'markCurhatAsRead'])->name('gurubk.curhat.mark-read');
+    Route::post('/gurubk/curhat/{id}/reply', [\App\Http\Controllers\GuruBkController::class, 'replyToConsultation'])->name('gurubk.curhat.reply');
 });
 
 
@@ -84,6 +85,7 @@ Route::middleware('auth')->group(function () {
  Route::delete('/rekap/{id}', [RekapController::class, 'destroy'])->name('rekap.destroy');
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {
+    Route::get('/konsultasi', [\App\Http\Controllers\SiswaConsultationController::class, 'index'])->name('konsultasi.index');
     Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
     Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
 });

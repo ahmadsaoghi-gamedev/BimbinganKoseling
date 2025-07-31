@@ -19,10 +19,13 @@ class Konsultasi extends Model
         'tgl_curhat',
         'status_baca',
         'attachment',
+        'reply_guru',
+        'reply_date',
     ];
 
     protected $casts = [
         'tgl_curhat' => 'datetime',
+        'reply_date' => 'datetime',
     ];
 
     public function user(): BelongsTo

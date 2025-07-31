@@ -40,7 +40,7 @@
                 
                 @if(auth()->user()->hasRole('siswa'))
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('konsultasi.create')" :active="request()->routeIs('konsultasi.create')">
+                    <x-nav-link :href="route('konsultasi.index')" :active="request()->routeIs('konsultasi.*')">
                         {{ __('Curhat Rahasia') }}
                     </x-nav-link>
                 </div>
