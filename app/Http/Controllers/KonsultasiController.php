@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\WhatsAppNotificationService;
 
 class KonsultasiController extends Controller
 {
@@ -84,8 +85,19 @@ class KonsultasiController extends Controller
 
         // Update status konsultasi
         $konsultasi->update([
-            'status_baca' => 'dalam percakapan',
+            'status_baca' => Konsultasi::STATUS_DALAM_PERCAKAPAN,
         ]);
+
+        // Kirim notifikasi WhatsApp menggunakan service
+        $whatsappService = new WhatsAppNotificationService();
+        
+        if ($user->hasRole('gurubk')) {
+            // Jika guru yang membalas, kirim notifikasi ke siswa
+            $whatsappService->notifyBalasanGuru($konsultasi->id_siswa);
+        } else {
+            // Jika siswa yang membalas, kirim notifikasi ke guru BK
+            $whatsappService->notifyBalasanSiswa($user->name);
+        }
 
         $notification = [
             'message' => 'Balasan berhasil dikirim!',
@@ -115,21 +127,13 @@ class KonsultasiController extends Controller
             'id_siswa' => Auth::user()->id,
             'isi_curhat' => $request->isi_curhat,
             'tgl_curhat' => now(),
-            'status_baca' => 'belum dibaca',
+            'status_baca' => Konsultasi::STATUS_BELUM_DIBACA,
             'attachment' => $attachmentPath,
         ]);
 
-        try {
-            $guruBkPhoneNumber = '081234567890';
-            $pesan = "Notifikasi Konsultasi Baru: Seorang siswa telah mengirimkan curhat/konsultasi. Mohon periksa dashboard aplikasi untuk melihat detailnya.";
-            Http::withHeaders(['Authorization' => env('FONNTE_API_TOKEN')])
-                ->post('https://api.fonnte.com/send', [
-                    'target' => $guruBkPhoneNumber,
-                    'message' => $pesan,
-                ]);
-        } catch (\Exception $e) {
-            Log::error('Gagal mengirim notifikasi WA untuk konsultasi baru: ' . $e->getMessage());
-        }
+        // Kirim notifikasi WhatsApp ke Guru BK menggunakan service
+        $whatsappService = new WhatsAppNotificationService();
+        $whatsappService->notifyCurhatBaru(Auth::user()->id);
 
         $notification = ['message' => 'Curhat rahasia berhasil dikirim!', 'alert-type' => 'success'];
         return redirect()->route('konsultasi.create')->with($notification);

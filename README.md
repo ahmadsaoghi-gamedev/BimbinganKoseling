@@ -1,51 +1,142 @@
-# Aplikasi Bimbingan Konseling SMKN Negeri 1 Cilaku
+# 📚 Sistem Bimbingan Konseling SMKN 1 Cilaku
 
-## Deskripsi Singkat
+Sistem informasi bimbingan konseling berbasis web yang memungkinkan komunikasi antara siswa dan guru BK dengan fitur notifikasi WhatsApp otomatis.
 
-Aplikasi ini merupakan sistem bimbingan konseling berbasis web yang dirancang untuk memfasilitasi komunikasi dan pengelolaan data antara siswa dan Guru Bimbingan Konseling (Guru BK) di SMKN Negeri 1 Cilaku. Aplikasi ini membantu siswa dalam menyampaikan pengaduan, curhat rahasia, dan mendapatkan bimbingan secara efektif dan terorganisir.
+## ✨ Fitur Utama
 
-## Tujuan Aplikasi
+-   🔐 **Multi-Role Authentication** (Admin, Guru BK, Siswa)
+-   💬 **Curhat Rahasia** - Komunikasi pribadi siswa dengan guru BK
+-   📋 **Formulir Cek Masalah** - Siswa mengisi, guru BK mereview
+-   🤝 **Bimbingan Konseling** - Konsultasi umum
+-   📅 **Bimbingan Lanjutan** - Tindak lanjut kasus
+-   📱 **Notifikasi WhatsApp** - Otomatis untuk setiap aktivitas penting
+-   📎 **File Upload** - Attachment pada curhat
+-   📊 **Dashboard** - Statistik dan overview
 
--   Mempermudah siswa dalam menyampaikan pengaduan dan curhat rahasia kepada Guru BK.
--   Memfasilitasi Guru BK dalam mengelola data siswa, pengaduan, dan hasil bimbingan.
--   Memberikan notifikasi WhatsApp otomatis kepada Guru BK dan siswa terkait aktivitas pengaduan dan bimbingan menggunakan layanan API Fonnte.
--   Menyediakan dashboard yang mudah digunakan untuk semua pengguna sesuai peran (siswa, Guru BK, admin).
+## 🚀 Quick Start
 
-## Fitur Utama
+### Untuk Windows:
 
--   **Pengaduan Siswa:** Siswa dapat membuat laporan pengaduan yang akan diteruskan ke Guru BK.
--   **Curhat Rahasia:** Siswa dapat mengirimkan curhat rahasia yang hanya dapat dilihat oleh Guru BK.
--   **Daftar Curhat:** Guru BK dapat melihat daftar curhat rahasia siswa lengkap dengan status baca.
--   **Rekap Bimbingan:** Guru BK dapat mencatat dan mengelola hasil bimbingan dengan siswa.
--   **Manajemen Data:** Admin dapat mengelola data siswa, Guru BK, dan pelanggaran.
--   **Notifikasi WhatsApp:** Integrasi dengan API Fonnte untuk mengirim notifikasi otomatis saat pengaduan baru dibuat dan saat Guru BK memberikan balasan.
+```bash
+# Clone repository
+git clone https://github.com/[username]/BimbinganKoseling.git
+cd BimbinganKoseling
 
-## Teknologi yang Digunakan
+# Jalankan setup otomatis
+setup.bat
+```
 
--   Laravel Framework (PHP)
--   Tailwind CSS untuk styling
--   SQLite sebagai database (dapat disesuaikan)
--   API Fonnte untuk notifikasi WhatsApp
+### Untuk Linux/Mac:
 
-## Cara Penggunaan
+```bash
+# Clone repository
+git clone https://github.com/[username]/BimbinganKoseling.git
+cd BimbinganKoseling
 
-1. **Instalasi:** Clone repository dan jalankan `composer install`.
-2. **Konfigurasi:** Salin `.env.example` menjadi `.env` dan isi variabel `FONNTE_API_TOKEN` dengan token API Fonnte Anda.
-3. **Migrasi dan Seed:** Jalankan migrasi dan seed database dengan `php artisan migrate --seed`.
-4. **Jalankan Server:** Gunakan `php artisan serve` untuk menjalankan aplikasi.
-5. **Akses Aplikasi:** Login sebagai siswa, Guru BK, atau admin sesuai akun yang tersedia.
-6. **Gunakan Fitur:** Siswa dapat membuat pengaduan dan curhat rahasia, Guru BK dapat melihat dan membalas curhat, serta mengelola data.
+# Beri permission dan jalankan setup
+chmod +x setup.sh
+./setup.sh
+```
 
-## Catatan Penting
+## 📖 Panduan Lengkap
 
--   Pastikan variabel `FONNTE_API_TOKEN` sudah diatur di file `.env` agar notifikasi WhatsApp dapat berfungsi.
--   Hak akses diatur berdasarkan peran pengguna untuk menjaga keamanan data.
--   Fitur curhat rahasia menjaga privasi siswa dengan hanya dapat diakses oleh Guru BK.
+Untuk panduan instalasi detail, baca: **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)**
 
-## Kontak
+## 👤 Akun Default
 
-Untuk pertanyaan atau bantuan lebih lanjut, silakan hubungi tim pengembang aplikasi.
+Setelah setup selesai:
+
+| Role    | Email            | Password |
+| ------- | ---------------- | -------- |
+| Admin   | admin@gmail.com  | password |
+| Guru BK | gurubk@gmail.com | password |
+| Siswa   | siswa@gmail.com  | password |
+
+## 🔧 Konfigurasi Penting
+
+### 1. Database
+
+Edit file `.env`:
+
+```env
+DB_DATABASE=bimbingan_konseling
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 2. WhatsApp Notification
+
+Daftar di [Fonnte.com](https://fonnte.com) dan tambahkan token:
+
+```env
+FONNTE_API_TOKEN=your_token_here
+```
+
+## 📱 Test WhatsApp
+
+```bash
+php artisan whatsapp:test
+```
+
+## 🛠️ Tech Stack
+
+-   **Backend**: Laravel 10
+-   **Frontend**: Blade Templates, Tailwind CSS
+-   **Database**: MySQL
+-   **WhatsApp API**: Fonnte
+-   **Authentication**: Laravel Breeze + Spatie Roles
+
+## 📁 Struktur Project
+
+```
+├── app/
+│   ├── Http/Controllers/     # Controllers
+│   ├── Models/              # Eloquent Models
+│   └── Services/            # Business Logic
+├── database/
+│   ├── migrations/          # Database Migrations
+│   └── seeders/            # Data Seeders
+├── resources/
+│   └── views/              # Blade Templates
+└── routes/
+    └── web.php             # Web Routes
+```
+
+## 🔄 Workflow
+
+### Curhat Rahasia:
+
+1. Siswa login → Buat curhat
+2. Notifikasi WhatsApp ke Guru BK
+3. Guru BK login → Balas curhat
+4. Notifikasi WhatsApp ke Siswa
+
+### Formulir Cek Masalah:
+
+1. Siswa mengisi formulir
+2. Guru BK mereview dan beri tindak lanjut
+3. Notifikasi hasil ke siswa
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Buat branch feature (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+## 📞 Support
+
+Jika mengalami masalah:
+
+1. Cek `storage/logs/laravel.log`
+2. Pastikan semua persyaratan sistem terpenuhi
+3. Jalankan `php artisan cache:clear`
+
+## 📄 License
+
+Project ini menggunakan [MIT License](LICENSE).
 
 ---
 
-Dokumentasi ini memberikan gambaran singkat dan penting agar pengguna dan pengembang memahami tujuan dan fungsi utama aplikasi bimbingan konseling ini.
+**Dibuat dengan ❤️ untuk membantu sistem bimbingan konseling di sekolah**

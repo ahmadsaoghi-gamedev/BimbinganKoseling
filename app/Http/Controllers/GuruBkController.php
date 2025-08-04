@@ -7,6 +7,9 @@ use App\Models\GuruBK;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Services\WhatsAppNotificationService;
 
 class GuruBkController extends Controller
 {
@@ -74,8 +77,19 @@ class GuruBkController extends Controller
 
         // Update status konsultasi
         $konsultasi->update([
-            'status_baca' => 'dalam percakapan',
+            'status_baca' => \App\Models\Konsultasi::STATUS_DALAM_PERCAKAPAN,
         ]);
+
+        // Kirim notifikasi WhatsApp menggunakan service
+        $whatsappService = new WhatsAppNotificationService();
+        
+        if ($user->hasRole('gurubk')) {
+            // Jika guru yang membalas, kirim notifikasi ke siswa
+            $whatsappService->notifyBalasanGuru($konsultasi->id_siswa);
+        } else {
+            // Jika siswa yang membalas, kirim notifikasi ke guru BK
+            $whatsappService->notifyBalasanSiswa($user->name);
+        }
 
         $notification = [
             'message' => 'Pesan berhasil dikirim!',
@@ -89,7 +103,7 @@ class GuruBkController extends Controller
     public function markCurhatAsRead($id)
     {
         $curhat = \App\Models\Konsultasi::findOrFail($id);
-        $curhat->update(['status_baca' => 'sudah dibaca']);
+        $curhat->update(['status_baca' => \App\Models\Konsultasi::STATUS_SUDAH_DIBACA]);
 
         $notification = [
             'message' => 'Curhat telah ditandai sebagai sudah dibaca',
@@ -256,6 +270,10 @@ class GuruBkController extends Controller
             'status' => 'selesai',
         ]);
 
+        // Kirim notifikasi WhatsApp ke siswa menggunakan service
+        $whatsappService = new WhatsAppNotificationService();
+        $whatsappService->notifyBimbinganLanjutan($request->id_siswa, $request->tanggal_bimbingan);
+
         $notification = [
             'message' => 'Bimbingan lanjutan berhasil ditambahkan!',
             'alert-type' => 'success'
@@ -313,80 +331,41 @@ class GuruBkController extends Controller
 
     // ===== FITUR DAFTAR CEK MASALAH =====
     
+    // Menampilkan hasil daftar cek masalah yang sudah diisi siswa
     public function daftarCekMasalah()
     {
-        $daftarMasalah = [
-            'akademik' => [
-                'Kesulitan memahami pelajaran',
-                'Nilai rendah',
-                'Tidak mengerjakan tugas',
-                'Sering terlambat mengumpulkan tugas',
-                'Kurang motivasi belajar'
-            ],
-            'sosial' => [
-                'Sulit bergaul dengan teman',
-                'Konflik dengan teman sekelas',
-                'Merasa dikucilkan',
-                'Kesulitan berkomunikasi',
-                'Pemalu berlebihan'
-            ],
-            'pribadi' => [
-                'Masalah keluarga',
-                'Masalah keuangan',
-                'Masalah kesehatan',
-                'Kurang percaya diri',
-                'Mudah marah/emosional'
-            ],
-            'karir' => [
-                'Bingung memilih jurusan',
-                'Tidak tahu minat dan bakat',
-                'Khawatir tentang masa depan',
-                'Kurang informasi dunia kerja',
-                'Tidak ada motivasi untuk melanjutkan studi'
-            ]
-        ];
-
-        $user = auth()->user();
-        
-        if ($user->hasRole('siswa')) {
-            // Siswa hanya bisa melihat data dirinya sendiri
-            $siswa = \App\Models\Siswa::where('id_user', $user->id)->get();
-        } else {
-            // Guru BK bisa melihat semua siswa
-            $siswa = \App\Models\Siswa::all();
-        }
-        
-        return view('guru_bk.daftar_cek_masalah.index', compact('daftarMasalah', 'siswa'));
+        $cekMasalahs = \App\Models\CekMasalah::with('siswa')->orderBy('created_at', 'desc')->get();
+        return view('guru_bk.daftar_cek_masalah.hasil', compact('cekMasalahs'));
     }
 
-    public function storeCekMasalah(Request $request)
+    // Review dan tindak lanjut cek masalah siswa
+    public function reviewCekMasalah(Request $request, $id)
     {
+        $cekMasalah = \App\Models\CekMasalah::findOrFail($id);
+        
         $request->validate([
-            'id_siswa' => 'required|exists:siswa,id',
-            'kategori_masalah' => 'required|string',
-            'masalah_terpilih' => 'required|array',
-            'masalah_lain' => 'nullable|string',
-            'tingkat_urgensi' => 'required|in:rendah,sedang,tinggi',
-            'catatan_guru' => 'nullable|string',
+            'catatan_guru' => 'required|string',
+            'tindak_lanjut' => 'required|string',
+            'status' => 'required|in:reviewed,follow_up,completed'
         ]);
 
-        $masalahList = implode(', ', $request->masalah_terpilih);
-        if ($request->masalah_lain) {
-            $masalahList .= ', ' . $request->masalah_lain;
+        $cekMasalah->update([
+            'catatan_guru' => $request->catatan_guru,
+            'tindak_lanjut' => $request->tindak_lanjut,
+            'status' => $request->status,
+            'tanggal_review' => now(),
+        ]);
+
+        // Send WhatsApp notification to student
+        try {
+            $whatsappService = new WhatsAppNotificationService();
+            $whatsappService->notifyHasilCekMasalah($cekMasalah);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send WhatsApp notification for cek masalah review: ' . $e->getMessage());
         }
 
-        \App\Models\Rekap::create([
-            'id_siswa' => $request->id_siswa,
-            'masalah' => $masalahList,
-            'solusi' => 'Perlu ditindaklanjuti - ' . $request->tingkat_urgensi,
-            'tindak_lanjut' => $request->catatan_guru ?? 'Akan dijadwalkan sesi konseling',
-            'tanggal_bimbingan' => now(),
-            'jenis_bimbingan' => 'cek_masalah',
-            'status' => 'proses',
-        ]);
-
         $notification = [
-            'message' => 'Daftar cek masalah berhasil disimpan!',
+            'message' => 'Review berhasil disimpan dan notifikasi telah dikirim ke siswa.',
             'alert-type' => 'success'
         ];
 

@@ -58,9 +58,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/bimbingan-lanjutan', [GuruBkController::class, 'bimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan');
     });
 
-    // Routes untuk Daftar Cek Masalah - Siswa dan Guru BK
-    Route::middleware('role:siswa|gurubk')->group(function () {
+    // Routes untuk Daftar Cek Masalah - Hanya Guru BK yang bisa melihat hasil
+    Route::middleware('role:gurubk')->group(function () {
         Route::get('/daftar-cek-masalah', [GuruBkController::class, 'daftarCekMasalah'])->name('gurubk.daftar-cek-masalah');
+    });
+
+    // Routes untuk Siswa mengisi Daftar Cek Masalah
+    Route::middleware('role:siswa')->group(function () {
+        Route::get('/siswa/cek-masalah/create', [App\Http\Controllers\SiswaCekMasalahController::class, 'create'])->name('siswa.cek-masalah.create');
+        Route::post('/siswa/cek-masalah', [App\Http\Controllers\SiswaCekMasalahController::class, 'store'])->name('siswa.cek-masalah.store');
     });
 
     // Routes untuk Pengaduan - Siswa, Admin dan Guru BK
@@ -84,6 +90,7 @@ Route::middleware('auth')->group(function () {
         
         // Daftar Cek Masalah - Management
         Route::post('/daftar-cek-masalah', [GuruBkController::class, 'storeCekMasalah'])->name('gurubk.daftar-cek-masalah.store');
+        Route::put('/daftar-cek-masalah/{id}/review', [GuruBkController::class, 'reviewCekMasalah'])->name('gurubk.review-cek-masalah');
     });
 
     // Routes khusus Admin dan Guru BK - Pengaduan Management
@@ -120,6 +127,17 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:kesiswaan')->group(function () {
         Route::resource('pelanggaran', PelanggaranController::class)->except(['index']);
+    });
+
+    // WhatsApp Management Routes - Hanya untuk Admin dan Guru BK
+    Route::middleware('role:admin|gurubk')->prefix('whatsapp')->name('whatsapp.')->group(function () {
+        Route::get('/', [App\Http\Controllers\WhatsAppController::class, 'index'])->name('index');
+        Route::get('/test-connection', [App\Http\Controllers\WhatsAppController::class, 'testConnection'])->name('test-connection');
+        Route::post('/send-test', [App\Http\Controllers\WhatsAppController::class, 'sendTestMessage'])->name('send-test');
+        Route::post('/update-guru-phone/{id}', [App\Http\Controllers\WhatsAppController::class, 'updateGuruBkPhone'])->name('update-guru-phone');
+        Route::post('/update-siswa-phone/{id}', [App\Http\Controllers\WhatsAppController::class, 'updateSiswaPhone'])->name('update-siswa-phone');
+        Route::post('/send-broadcast', [App\Http\Controllers\WhatsAppController::class, 'sendBroadcast'])->name('send-broadcast');
+        Route::get('/logs', [App\Http\Controllers\WhatsAppController::class, 'viewLogs'])->name('logs');
     });
 });
 

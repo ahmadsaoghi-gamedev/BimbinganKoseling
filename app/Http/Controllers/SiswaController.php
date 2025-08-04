@@ -121,12 +121,11 @@ class SiswaController extends Controller
         }
 
         // Update the user's information
-        $user = new User();
         $user->name = $request['nama'];
         $user->email = $request['email'];
-        $user->password = Hash::make('password');
+        // Only update password if needed, otherwise keep the existing one
+        // $user->password = Hash::make('password');
         $user->save();
-;
 
         // Update the Siswa information
         $siswa->update([

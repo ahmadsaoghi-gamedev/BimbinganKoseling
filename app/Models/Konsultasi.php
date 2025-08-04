@@ -14,6 +14,12 @@ class Konsultasi extends Model
     protected $table = 'konsultasi';
     protected $primaryKey = 'id';
 
+    // Status constants
+    const STATUS_BELUM_DIBACA = 'belum dibaca';
+    const STATUS_SUDAH_DIBACA = 'sudah dibaca';
+    const STATUS_DALAM_PERCAKAPAN = 'dalam percakapan';
+    const STATUS_SELESAI = 'selesai';
+
     protected $fillable = [
         'id_siswa',
         'isi_curhat',
@@ -28,6 +34,19 @@ class Konsultasi extends Model
         'tgl_curhat' => 'datetime',
         'reply_date' => 'datetime',
     ];
+
+    /**
+     * Get all valid status values
+     */
+    public static function getValidStatuses()
+    {
+        return [
+            self::STATUS_BELUM_DIBACA,
+            self::STATUS_SUDAH_DIBACA,
+            self::STATUS_DALAM_PERCAKAPAN,
+            self::STATUS_SELESAI,
+        ];
+    }
 
     public function user(): BelongsTo
     {
