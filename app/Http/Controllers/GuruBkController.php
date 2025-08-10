@@ -371,4 +371,25 @@ class GuruBkController extends Controller
 
         return redirect()->route('gurubk.daftar-cek-masalah')->with($notification);
     }
+
+    /**
+     * Cetak surat pemanggilan orang tua
+     */
+    public function cetakSuratPemanggilan($id)
+    {
+        $cekMasalah = \App\Models\CekMasalah::with('siswa')->findOrFail($id);
+        
+        // Data sekolah - bisa diambil dari config atau database
+        $dataSekolah = [
+            'nama' => 'SMK Negeri 1 Cilaku',
+            'alamat' => 'Jl. Raya Cilaku No. 123, Cilaku, Cianjur',
+            'telepon' => '(0263) 123456',
+            'email' => 'info@smkn1cilaku.sch.id',
+            'website' => 'www.smkn1cilaku.sch.id',
+            'kepala_sekolah' => 'Drs. H. Ahmad Suryadi, M.Pd',
+            'guru_bk' => auth()->user()->name ?? 'Guru BK'
+        ];
+
+        return view('guru_bk.surat_pemanggilan.cetak', compact('cekMasalah', 'dataSekolah'));
+    }
 }

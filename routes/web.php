@@ -69,6 +69,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/siswa/cek-masalah', [App\Http\Controllers\SiswaCekMasalahController::class, 'store'])->name('siswa.cek-masalah.store');
     });
 
+    // Routes untuk DCM Report - Siswa dan Guru BK bisa akses
+    Route::middleware('role:siswa|gurubk')->group(function () {
+        Route::get('/siswa/cek-masalah/{id}/dcm-report', [App\Http\Controllers\SiswaCekMasalahController::class, 'showDCMReport'])->name('siswa.cek-masalah.dcm-report');
+    });
+
     // Routes untuk Pengaduan - Siswa, Admin dan Guru BK
     Route::middleware('role:siswa|admin|gurubk')->group(function () {
         Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');
@@ -91,6 +96,7 @@ Route::middleware('auth')->group(function () {
         // Daftar Cek Masalah - Management
         Route::post('/daftar-cek-masalah', [GuruBkController::class, 'storeCekMasalah'])->name('gurubk.daftar-cek-masalah.store');
         Route::put('/daftar-cek-masalah/{id}/review', [GuruBkController::class, 'reviewCekMasalah'])->name('gurubk.review-cek-masalah');
+        Route::get('/daftar-cek-masalah/{id}/surat-pemanggilan', [GuruBkController::class, 'cetakSuratPemanggilan'])->name('gurubk.cetak-surat-pemanggilan');
     });
 
     // Routes khusus Admin dan Guru BK - Pengaduan Management

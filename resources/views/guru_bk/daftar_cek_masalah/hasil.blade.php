@@ -82,11 +82,8 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                {{ $cekMasalah->kategori_masalah == 'akademik' ? 'bg-blue-100 text-blue-800' : 
-                                                   ($cekMasalah->kategori_masalah == 'sosial' ? 'bg-green-100 text-green-800' : 
-                                                   ($cekMasalah->kategori_masalah == 'pribadi' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800')) }}">
-                                                {{ ucfirst($cekMasalah->kategori_masalah) }}
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->kategori_masalah_badge }}">
+                                                {{ $cekMasalah->kategori_masalah_string }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -110,6 +107,20 @@
                                             >
                                                 <i class="fas fa-eye mr-1"></i>Detail
                                             </button>
+                                            <a href="{{ route('siswa.cek-masalah.dcm-report', $cekMasalah->id) }}"
+                                                class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 mr-3"
+                                                title="Lihat DCM Report"
+                                                target="_blank">
+                                                <i class="fas fa-chart-bar mr-1"></i>DCM
+                                            </a>
+                                            @if($cekMasalah->tingkat_urgensi == 'tinggi' || $cekMasalah->status == 'follow_up')
+                                            <a href="{{ route('gurubk.cetak-surat-pemanggilan', $cekMasalah->id) }}"
+                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3"
+                                                title="Cetak Surat Pemanggilan Orang Tua"
+                                                target="_blank">
+                                                <i class="fas fa-envelope mr-1"></i>Surat
+                                            </a>
+                                            @endif
                                             @if($cekMasalah->status == 'pending')
                                             <button 
                                                 x-data=""
@@ -130,7 +141,7 @@
                                             <div class="space-y-4">
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kategori Masalah:</label>
-                                                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ ucfirst($cekMasalah->kategori_masalah) }}</p>
+                                                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $cekMasalah->kategori_masalah_string }}</p>
                                                 </div>
                                                 
                                                 <div>

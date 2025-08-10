@@ -42,4 +42,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the siswa record associated with the user.
+     */
+    public function siswa()
+    {
+        return $this->hasOne(Siswa::class, 'id_user', 'id');
+    }
+
+    /**
+     * Get the guru BK record associated with the user.
+     */
+    public function guruBk()
+    {
+        return $this->hasOne(GuruBK::class, 'user_id', 'id');
+    }
 }

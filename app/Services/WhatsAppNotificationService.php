@@ -337,4 +337,27 @@ class WhatsAppNotificationService
     {
         return $this->sendMessagePrivate($phoneNumber, $message);
     }
+
+    /**
+     * Kirim notifikasi pelanggaran kritis ke orang tua/siswa
+     */
+    public function sendViolationNotification($phoneNumber, $message)
+    {
+        try {
+            Log::info("Sending violation notification to: {$phoneNumber}");
+            
+            $result = $this->sendMessage($phoneNumber, $message);
+            
+            if ($result) {
+                Log::info("Violation notification sent successfully to {$phoneNumber}");
+            } else {
+                Log::error("Failed to send violation notification to {$phoneNumber}");
+            }
+            
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('Error sending violation notification: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

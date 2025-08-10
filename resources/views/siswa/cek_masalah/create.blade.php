@@ -34,8 +34,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             @foreach($daftarMasalah as $kategori => $masalahList)
                                 <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border-2 kategori-card" data-kategori="{{ $kategori }}">
-                                    <h4 class="text-lg font-semibold mb-3 text-{{ $kategori == 'akademik' ? 'blue' : ($kategori == 'sosial' ? 'green' : ($kategori == 'pribadi' ? 'purple' : 'orange')) }}-600">
-                                        <i class="fas fa-{{ $kategori == 'akademik' ? 'book' : ($kategori == 'sosial' ? 'users' : ($kategori == 'pribadi' ? 'heart' : 'briefcase')) }} mr-2"></i>
+                                    <h4 class="text-lg font-semibold mb-3 text-{{ $kategori == 'pribadi' ? 'purple' : ($kategori == 'sosial' ? 'green' : ($kategori == 'belajar' ? 'blue' : 'orange')) }}-600">
+                                        <i class="fas fa-{{ $kategori == 'pribadi' ? 'heart' : ($kategori == 'sosial' ? 'users' : ($kategori == 'belajar' ? 'book' : 'briefcase')) }} mr-2"></i>
                                         {{ ucfirst($kategori) }}
                                     </h4>
                                     
@@ -51,10 +51,10 @@
                                         @endforeach
                                     </div>
 
-                                    <!-- Radio button untuk kategori (hidden) -->
-                                    <input type="radio" name="kategori_masalah" value="{{ $kategori }}" 
-                                           class="hidden kategori-radio" id="kategori_{{ $kategori }}"
-                                           {{ old('kategori_masalah') == $kategori ? 'checked' : '' }}>
+                                    <!-- Hidden checkbox untuk kategori (multiple selection) -->
+                                    <input type="checkbox" name="kategori_masalah[]" value="{{ $kategori }}" 
+                                           class="hidden kategori-checkbox" id="kategori_{{ $kategori }}"
+                                           {{ in_array($kategori, old('kategori_masalah', [])) ? 'checked' : '' }}>
                                 </div>
                             @endforeach
                         </div>
@@ -135,15 +135,14 @@
     </div>
 
     <script>
-        // Auto-select kategori when checkbox is checked
+        // Auto-select kategori when checkbox is checked (MULTIPLE CATEGORIES ALLOWED)
         document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('.masalah-checkbox');
-            const kategoriCards = document.querySelectorAll('.kategori-card');
             
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const kategori = this.dataset.kategori;
-                    const kategoriRadio = document.getElementById('kategori_' + kategori);
+                    const kategoriCheckbox = document.getElementById('kategori_' + kategori);
                     const kategoriCard = document.querySelector(`[data-kategori="${kategori}"]`);
                     
                     // Check if any checkbox in this category is checked
@@ -151,24 +150,27 @@
                     const hasChecked = Array.from(categoryCheckboxes).some(cb => cb.checked);
                     
                     if (hasChecked) {
-                        kategoriRadio.checked = true;
+                        // Mark this category as selected
+                        kategoriCheckbox.checked = true;
                         kategoriCard.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
-                        
-                        // Uncheck other categories
-                        kategoriCards.forEach(card => {
-                            if (card.dataset.kategori !== kategori) {
-                                card.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
-                                const otherCheckboxes = card.querySelectorAll('.masalah-checkbox');
-                                otherCheckboxes.forEach(cb => cb.checked = false);
-                                const otherRadio = document.getElementById('kategori_' + card.dataset.kategori);
-                                otherRadio.checked = false;
-                            }
-                        });
                     } else {
-                        kategoriRadio.checked = false;
+                        // Unmark this category if no problems selected
+                        kategoriCheckbox.checked = false;
                         kategoriCard.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
                     }
                 });
+            });
+
+            // Initialize on page load for old values
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const kategori = checkbox.dataset.kategori;
+                    const kategoriCheckbox = document.getElementById('kategori_' + kategori);
+                    const kategoriCard = document.querySelector(`[data-kategori="${kategori}"]`);
+                    
+                    kategoriCheckbox.checked = true;
+                    kategoriCard.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
+                }
             });
         });
     </script>
