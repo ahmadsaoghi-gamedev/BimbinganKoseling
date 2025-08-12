@@ -36,12 +36,16 @@
                         <tr class="">
                             <td>{{ $num++ }}</td>
                             <td>{{ $data->nip }}</td>
-                            <td>{{ $data->nama }}</td>
+                            <td>
+                                <a href="{{ route('guru_bk.show', $data->id) }}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                                    {{ $data->nama }}
+                                </a>
+                            </td>
                             <td>{{ $data->jenis_kelamin }}</td>
                             <td>{{ $data->no_tlp }}</td>
                             <td>{{ $data->alamat }}</td>
                             
-                            @if (Auth::user()->hasRole('guru_bk') || Auth::user()->hasRole('admin'))
+                            @if (Auth::user()->hasRole('admin'))
                             <td class="flex px-4 py-2 space-x-2">
                                 <!-- Tombol Edit -->
                                 <a href="{{ route('guru_bk.edit', $data->id) }}"

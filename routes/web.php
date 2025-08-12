@@ -17,13 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Data Siswa: Admin, gurubk, dan siswa
-    Route::middleware('role:admin|gurubk|siswa')->group(function () {
-        Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
-        Route::get('/siswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
-    });
-
-    // Data Siswa: CRUD operations hanya untuk admin & gurubk
+    // Data Siswa: CRUD operations hanya untuk admin & gurubk (harus didefinisikan dulu sebelum route show)
     Route::middleware('role:admin|gurubk')->group(function () {
         Route::get('/siswa/create', [SiswaController::class, 'create'])->name('siswa.create');
         Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store');
@@ -32,9 +26,25 @@ Route::middleware('auth')->group(function () {
         Route::delete('/siswa/{siswa}', [SiswaController::class, 'destroy'])->name('siswa.destroy');
     });
 
-    // Data Guru BK: Hanya admin
+    // Data Siswa: View untuk admin, gurubk, dan siswa
+    Route::middleware('role:admin|gurubk|siswa')->group(function () {
+        Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
+        Route::get('/siswa/{siswa}', [SiswaController::class, 'show'])->name('siswa.show');
+    });
+
+    // Data Guru BK: CRUD hanya untuk admin (harus didefinisikan dulu sebelum route show)
     Route::middleware('role:admin')->group(function () {
-        Route::resource('guru_bk', GuruBkController::class);
+        Route::get('/guru_bk/create', [GuruBkController::class, 'create'])->name('guru_bk.create');
+        Route::post('/guru_bk', [GuruBkController::class, 'store'])->name('guru_bk.store');
+        Route::get('/guru_bk/{guru_bk}/edit', [GuruBkController::class, 'edit'])->name('guru_bk.edit');
+        Route::patch('/guru_bk/{guru_bk}', [GuruBkController::class, 'update'])->name('guru_bk.update');
+        Route::delete('/guru_bk/{guru_bk}', [GuruBkController::class, 'destroy'])->name('guru_bk.destroy');
+    });
+    
+    // Data Guru BK: View hanya untuk admin
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/guru_bk', [GuruBkController::class, 'index'])->name('guru_bk.index');
+        Route::get('/guru_bk/{guru_bk}', [GuruBkController::class, 'show'])->name('guru_bk.show');
     });
 
     // Routes untuk Bimbingan Konseling - Siswa dan Guru BK
@@ -58,20 +68,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/bimbingan-lanjutan', [GuruBkController::class, 'bimbinganLanjutan'])->name('gurubk.bimbingan-lanjutan');
     });
 
-    // Routes untuk Daftar Cek Masalah - Hanya Guru BK yang bisa melihat hasil
-    Route::middleware('role:gurubk')->group(function () {
+    // Routes untuk Daftar Cek Masalah - Siswa dan Guru BK bisa akses
+    Route::middleware('role:siswa|gurubk')->group(function () {
         Route::get('/daftar-cek-masalah', [GuruBkController::class, 'daftarCekMasalah'])->name('gurubk.daftar-cek-masalah');
+        Route::get('/siswa/cek-masalah/{id}/dcm-report', [App\Http\Controllers\SiswaCekMasalahController::class, 'showDCMReport'])->name('siswa.cek-masalah.dcm-report');
     });
 
-    // Routes untuk Siswa mengisi Daftar Cek Masalah
+    // Routes untuk Siswa mengisi Daftar Cek Masalah (hanya siswa yang bisa create)
     Route::middleware('role:siswa')->group(function () {
         Route::get('/siswa/cek-masalah/create', [App\Http\Controllers\SiswaCekMasalahController::class, 'create'])->name('siswa.cek-masalah.create');
         Route::post('/siswa/cek-masalah', [App\Http\Controllers\SiswaCekMasalahController::class, 'store'])->name('siswa.cek-masalah.store');
-    });
-
-    // Routes untuk DCM Report - Siswa dan Guru BK bisa akses
-    Route::middleware('role:siswa|gurubk')->group(function () {
-        Route::get('/siswa/cek-masalah/{id}/dcm-report', [App\Http\Controllers\SiswaCekMasalahController::class, 'showDCMReport'])->name('siswa.cek-masalah.dcm-report');
     });
 
     // Routes untuk Pengaduan - Siswa, Admin dan Guru BK

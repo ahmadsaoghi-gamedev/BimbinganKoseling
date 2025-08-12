@@ -13,11 +13,18 @@ use App\Services\WhatsAppNotificationService;
 
 class GuruBkController extends Controller
 {
-    // Menampilkan daftar akun siswa
+    // Menampilkan daftar guru BK - semua user bisa lihat
     public function index()
     {
         $guru_bk = GuruBK::all();
         return view('guru_bk.index', compact('guru_bk'));
+    }
+
+    // Menampilkan detail guru BK
+    public function show($id)
+    {
+        $guru_bk = GuruBK::findOrFail($id);
+        return view('guru_bk.show', compact('guru_bk'));
     }
 
     // Menampilkan daftar curhat rahasia untuk Guru BK dan Siswa
@@ -113,15 +120,25 @@ class GuruBkController extends Controller
         return redirect()->route('gurubk.curhat')->with($notification);
     }
 
-    // Menampilkan form tambah akun siswa
+    // Menampilkan form tambah guru BK - hanya admin
     public function create()
     {
+        // Cek apakah user adalah admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Anda tidak memiliki akses untuk menambah data guru BK.');
+        }
+        
         return view('guru_bk.create');
     }
 
-    // Menyimpan akun siswa baru
+    // Menyimpan guru BK baru - hanya admin
     public function store(Request $request)
     {
+        // Cek apakah user adalah admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Anda tidak memiliki akses untuk menambah data guru BK.');
+        }
+
         $request->validate([
             'nip' => 'required|max:255',
             'nama' => 'required|max:255',
@@ -158,12 +175,22 @@ class GuruBkController extends Controller
 
     public function edit(string $id)
     {
+        // Cek apakah user adalah admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data guru BK.');
+        }
+
         $gurubk = GuruBK::findOrFail($id);
         return view('guru_bk.edit', $gurubk);
     }
 
     public function update(Request $request, string $id)
     {
+        // Cek apakah user adalah admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data guru BK.');
+        }
+
         // Validate the incoming request
         $validate = $request->validate([
             'nip' => 'required|max:255',
@@ -204,6 +231,11 @@ class GuruBkController extends Controller
 
     public function destroy($id)
     {
+        // Cek apakah user adalah admin
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data guru BK.');
+        }
+
         $gurubk = GuruBK::findOrFail($id);
         $gurubk->delete();
 
@@ -212,7 +244,7 @@ class GuruBkController extends Controller
             'alert-type' => 'success',
         );
 
-        return redirect()->route('guru_bk.index')->with('success', 'Data Guru Berhasil Ditambahkan');
+        return redirect()->route('guru_bk.index')->with($notification);
     }
 
     // ===== FITUR BIMBINGAN LANJUTAN =====

@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
            
-            <div class="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 shadow-2xl rounded-lg overflow-hidden mb-10">
+            <div class="bg-gradient-to-r from-red-700 via-red-800 to-red-900 shadow-2xl rounded-lg overflow-hidden mb-10">
                 <div class="p-8 text-white">
                     <h1 class="text-3xl font-extrabold mb-3">Selamat Datang di Aplikasi Bimbingan Konseling SMKN NEGERI 1 CILAKU</h1>
                    
