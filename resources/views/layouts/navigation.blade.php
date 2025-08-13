@@ -32,7 +32,7 @@
                 <div class="hidden xl:flex items-center space-x-1 ml-6" x-data="{ activeDropdown: null }">
                     
                     <!-- Data Management Dropdown -->
-                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))
+                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk') || auth()->user()->hasRole('siswa'))
                     <div class="relative" @mouseenter="activeDropdown = 'data'" @mouseleave="activeDropdown = null">
                         <button class="nav-link group">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -51,13 +51,15 @@
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
                              class="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))
                             <a href="{{ route('siswa.index') }}" class="dropdown-item {{ request()->routeIs('siswa.*') ? 'active' : '' }}">
                                 <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 <span>Data Siswa</span>
                             </a>
-                            @if(auth()->user()->hasRole('admin'))
+                            @endif
+                            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('siswa'))
                             <a href="{{ route('guru_bk.index') }}" class="dropdown-item {{ request()->routeIs('guru_bk.*') ? 'active' : '' }}">
                                 <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
@@ -263,7 +265,7 @@
             </x-responsive-nav-link>
             @endif
             
-            @if(auth()->user()->hasRole('admin'))
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('siswa'))
             <x-responsive-nav-link :href="route('guru_bk.index')" :active="request()->routeIs('guru_bk.*')" class="flex items-center">
                 <svg class="w-4 h-4 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>

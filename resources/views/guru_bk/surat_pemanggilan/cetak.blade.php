@@ -26,23 +26,35 @@
             margin-bottom: 20px;
         }
         
+        .kop-surat .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
         .kop-surat img {
             width: 80px;
             height: 80px;
-            float: left;
             margin-right: 20px;
+        }
+        
+        .kop-surat .text-container {
+            text-align: center;
         }
         
         .kop-surat h1 {
             font-size: 16pt;
             margin: 0;
             font-weight: bold;
+            line-height: 1.2;
         }
         
         .kop-surat h2 {
             font-size: 18pt;
             margin: 5px 0;
             font-weight: bold;
+            color: #1a365d;
         }
         
         .kop-surat p {
@@ -178,12 +190,16 @@
 
     <!-- KOP SURAT -->
     <div class="kop-surat">
-        <img src="/img/Logo smk.png" alt="Logo Sekolah">
-        <h1>PEMERINTAH PROVINSI JAWA BARAT</h1>
-        <h1>DINAS PENDIDIKAN</h1>
-        <h2>{{ strtoupper($dataSekolah['nama']) }}</h2>
-        <p>{{ $dataSekolah['alamat'] }}</p>
-        <p>Telp. {{ $dataSekolah['telepon'] }} | Email: {{ $dataSekolah['email'] }} | Website: {{ $dataSekolah['website'] }}</p>
+        <div class="logo-container">
+            <img src="/img/Logo smk.png" alt="Logo Sekolah">
+            <div class="text-container">
+                <h1>PEMERINTAH PROVINSI JAWA BARAT</h1>
+                <h1>DINAS PENDIDIKAN</h1>
+                <h2>{{ strtoupper($dataSekolah['nama']) }}</h2>
+                <p>{{ $dataSekolah['alamat'] }}</p>
+                <p>Telp. {{ $dataSekolah['telepon'] }} | Email: {{ $dataSekolah['email'] }} | Website: {{ $dataSekolah['website'] }}</p>
+            </div>
+        </div>
     </div>
 
     <!-- NOMOR SURAT -->
@@ -232,9 +248,9 @@
         kami menemukan beberapa hal yang perlu mendapat perhatian khusus terkait dengan perkembangan putra/putri Bapak/Ibu di sekolah.</p>
 
         <p>Berdasarkan hasil analisis Daftar Cek Masalah (DCM) yang telah diisi oleh siswa yang bersangkutan pada tanggal 
-        {{ $cekMasalah->created_at->format('d F Y') }}, ditemukan bahwa siswa tersebut mengalami beberapa permasalahan dengan 
-        tingkat urgensi <strong>{{ strtoupper($cekMasalah->tingkat_urgensi) }}</strong> yang memerlukan penanganan segera melalui 
-        kerjasama antara pihak sekolah dan orang tua.</p>
+        {{ $cekMasalah->created_at->format('d F Y') }}, ditemukan bahwa siswa tersebut mengalami beberapa permasalahan dalam kategori 
+        <strong>{{ $cekMasalah->kategori_masalah_string }}</strong> dengan tingkat urgensi <strong>{{ strtoupper($cekMasalah->tingkat_urgensi) }}</strong> 
+        yang memerlukan penanganan segera melalui kerjasama antara pihak sekolah dan orang tua.</p>
 
         <p>Untuk itu, kami mengharapkan kehadiran Bapak/Ibu pada:</p>
         

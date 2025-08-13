@@ -113,14 +113,12 @@
                                                 target="_blank">
                                                 <i class="fas fa-chart-bar mr-1"></i>DCM
                                             </a>
-                                            @if($cekMasalah->tingkat_urgensi == 'tinggi' || $cekMasalah->status == 'follow_up')
                                             <a href="{{ route('gurubk.cetak-surat-pemanggilan', $cekMasalah->id) }}"
                                                 class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 mr-3"
                                                 title="Cetak Surat Pemanggilan Orang Tua"
                                                 target="_blank">
                                                 <i class="fas fa-envelope mr-1"></i>Surat
                                             </a>
-                                            @endif
                                             @if($cekMasalah->status == 'pending')
                                             <button 
                                                 x-data=""

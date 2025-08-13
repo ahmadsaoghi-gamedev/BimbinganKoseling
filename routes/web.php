@@ -41,8 +41,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/guru_bk/{guru_bk}', [GuruBkController::class, 'destroy'])->name('guru_bk.destroy');
     });
     
-    // Data Guru BK: View hanya untuk admin
-    Route::middleware('role:admin')->group(function () {
+    // Data Guru BK: View untuk admin dan siswa
+    Route::middleware('role:admin|siswa')->group(function () {
         Route::get('/guru_bk', [GuruBkController::class, 'index'])->name('guru_bk.index');
         Route::get('/guru_bk/{guru_bk}', [GuruBkController::class, 'show'])->name('guru_bk.show');
     });
@@ -116,20 +116,14 @@ Route::middleware('auth')->group(function () {
     // Route untuk Rekap - Akses berdasarkan role
     Route::middleware('role:gurubk|siswa')->group(function(){
         Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index');
+        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
+        Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
     });
     
     Route::middleware('role:gurubk')->group(function(){
-        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
-        Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
         Route::get('/rekap/{rekap}/edit', [RekapController::class, 'edit'])->name('rekap.edit');
         Route::patch('/rekap/{rekap}', [RekapController::class, 'update'])->name('rekap.update');
         Route::delete('/rekap/{rekap}', [RekapController::class, 'destroy'])->name('rekap.destroy');
-    });
-
-    // Route untuk siswa - hanya create dan view rekap
-    Route::middleware('role:siswa')->group(function(){
-        Route::get('/rekap/create', [RekapController::class, 'create'])->name('rekap.create');
-        Route::post('/rekap', [RekapController::class, 'store'])->name('rekap.store');
     });
 
     // Data Pelanggaran: Kesiswaan (CRUD Lengkap) & Lainnya (hanya lihat)

@@ -19,6 +19,10 @@ class Rekap extends Model
         'tgl_bimbingan',
         'keterangan',
         'balasan',
+        'masalah',
+        'solusi',
+        'tindak_lanjut',
+        'status',
     ];
 
     public function siswa(): BelongsTo

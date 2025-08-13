@@ -297,7 +297,7 @@ class GuruBkController extends Controller
             'masalah' => $request->masalah,
             'solusi' => $request->solusi,
             'tindak_lanjut' => $request->tindak_lanjut,
-            'tanggal_bimbingan' => $request->tanggal_bimbingan,
+            'tgl_bimbingan' => $request->tanggal_bimbingan, // Perbaikan: gunakan tgl_bimbingan sesuai database
             'jenis_bimbingan' => 'lanjutan',
             'status' => 'selesai',
         ]);
@@ -337,7 +337,7 @@ class GuruBkController extends Controller
             'masalah' => $request->masalah,
             'solusi' => $request->solusi,
             'tindak_lanjut' => $request->tindak_lanjut,
-            'tanggal_bimbingan' => $request->tanggal_bimbingan,
+            'tgl_bimbingan' => $request->tanggal_bimbingan, // Perbaikan: gunakan tgl_bimbingan sesuai database
         ]);
 
         $notification = [
