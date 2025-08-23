@@ -63,15 +63,51 @@ class RekapController extends Controller
     // Validasi data
     $validated = $request->validate([
         'balasan' => 'required|string',
+        'tgl_bimbingan' => 'nullable|date',
+        'case_status' => 'nullable|in:open,in_progress,resolved,closed',
+        'final_resolution' => 'nullable|string|min:10',
+        'resolution_type' => 'nullable|string',
+        'resolution_notes' => 'nullable|string',
     ]);
 
     // Temukan data Rekap berdasarkan ID
     $rekap = Rekap::findOrFail($id);
 
-    // Update data balasan
-    $rekap->update([
+    // Prepare update data
+    $updateData = [
         'balasan' => $validated['balasan'],
-    ]);
+    ];
+
+    // Update tanggal bimbingan if provided
+    if (isset($validated['tgl_bimbingan'])) {
+        $updateData['tgl_bimbingan'] = $validated['tgl_bimbingan'];
+    }
+
+    // Update case status if provided
+    if (isset($validated['case_status'])) {
+        $updateData['case_status'] = $validated['case_status'];
+        
+        // If resolving the case, set resolution details
+        if (in_array($validated['case_status'], ['resolved', 'closed'])) {
+            $updateData['resolution_date'] = now();
+            $updateData['resolved_by'] = Auth::id();
+            
+            if (isset($validated['final_resolution'])) {
+                $updateData['final_resolution'] = $validated['final_resolution'];
+            }
+            
+            if (isset($validated['resolution_type'])) {
+                $updateData['resolution_type'] = $validated['resolution_type'];
+            }
+            
+            if (isset($validated['resolution_notes'])) {
+                $updateData['resolution_notes'] = $validated['resolution_notes'];
+            }
+        }
+    }
+
+    // Update data
+    $rekap->update($updateData);
 
     // WhatsApp Notification Logic for Guru BK Reply
     try {

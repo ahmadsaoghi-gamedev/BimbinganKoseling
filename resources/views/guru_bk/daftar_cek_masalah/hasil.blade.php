@@ -1,103 +1,101 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Hasil Daftar Cek Masalah Siswa') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    
-                    <!-- Header -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-semibold mb-2">Hasil Formulir Cek Masalah</h3>
-                        <p class="text-gray-600 dark:text-gray-400">
-                            Berikut adalah daftar formulir cek masalah yang telah diisi oleh siswa. 
-                            Anda dapat mereview dan memberikan tindak lanjut untuk setiap kasus.
-                        </p>
+@section('title', 'Hasil Daftar Cek Masalah Siswa')
+
+@section('content')
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900 dark:text-gray-100">
+                
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Hasil Formulir Cek Masalah</h2>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Berikut adalah daftar formulir cek masalah yang telah diisi oleh siswa. 
+                        Anda dapat mereview dan memberikan tindak lanjut untuk setiap kasus.
+                    </p>
+                </div>
+
+                @if(session('success'))
+                    <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Berhasil!</strong>
+                        <span class="block sm:inline">{{ session('success') }}</span>
                     </div>
+                @endif
 
-                    @if(session('success'))
-                        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                            <strong class="font-bold">Berhasil!</strong>
-                            <span class="block sm:inline">{{ session('success') }}</span>
+                @if($cekMasalahs->isEmpty())
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-clipboard-list text-6xl"></i>
                         </div>
-                    @endif
-
-                    @if($cekMasalahs->isEmpty())
-                        <div class="text-center py-8">
-                            <div class="text-gray-400 mb-4">
-                                <i class="fas fa-clipboard-list text-6xl"></i>
-                            </div>
-                            <p class="text-gray-500 dark:text-gray-400 text-lg">Belum ada formulir cek masalah yang diisi siswa.</p>
-                            <p class="text-gray-400 dark:text-gray-500 text-sm mt-2">Siswa dapat mengisi formulir melalui menu "Daftar Cek Masalah" di dashboard mereka.</p>
-                        </div>
-                    @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Siswa
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Kategori
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Urgensi
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Tanggal
-                                        </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    @foreach($cekMasalahs as $cekMasalah)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <div class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center">
-                                                        <span class="text-sm font-medium text-white">
-                                                            {{ substr($cekMasalah->siswa->nama ?? 'N/A', 0, 2) }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $cekMasalah->siswa->nama ?? 'N/A' }}
-                                                    </div>
-                                                    <div class="text-sm text-gray-500 dark:text-gray-300">
-                                                        {{ $cekMasalah->siswa->kelas ?? '' }} {{ $cekMasalah->siswa->jurusan ?? '' }}
-                                                    </div>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg">Belum ada formulir cek masalah yang diisi siswa.</p>
+                        <p class="text-gray-400 dark:text-gray-500 text-sm mt-2">Siswa dapat mengisi formulir melalui menu "Daftar Cek Masalah" di dashboard mereka.</p>
+                    </div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Siswa
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Kategori
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Urgensi
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Tanggal
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Aksi
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($cekMasalahs as $cekMasalah)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center">
+                                                    <span class="text-sm font-medium text-white">
+                                                        {{ substr($cekMasalah->siswa->nama ?? 'N/A', 0, 2) }}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->kategori_masalah_badge }}">
-                                                {{ $cekMasalah->kategori_masalah_string }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->urgency_badge }}">
-                                                {{ ucfirst($cekMasalah->tingkat_urgensi) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->status_badge }}">
-                                                {{ $cekMasalah->status_text }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                            {{ $cekMasalah->created_at->format('d/m/Y H:i') }}
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ $cekMasalah->siswa->nama ?? 'N/A' }}
+                                                </div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-300">
+                                                    {{ $cekMasalah->siswa->kelas ?? '' }} {{ $cekMasalah->siswa->jurusan ?? '' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->kategori_masalah_badge }}">
+                                            {{ $cekMasalah->kategori_masalah_string }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->urgency_badge }}">
+                                            {{ ucfirst($cekMasalah->tingkat_urgensi) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $cekMasalah->status_badge }}">
+                                            {{ $cekMasalah->status_text }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        {{ $cekMasalah->created_at->format('d/m/Y H:i') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button 
@@ -256,4 +254,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

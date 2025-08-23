@@ -17,3 +17,20 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// API route for getting student data
+Route::get('/siswa/{id}', function ($id) {
+    $siswa = \App\Models\Siswa::find($id);
+    
+    if (!$siswa) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Siswa tidak ditemukan'
+        ], 404);
+    }
+    
+    return response()->json([
+        'success' => true,
+        'data' => $siswa
+    ]);
+});

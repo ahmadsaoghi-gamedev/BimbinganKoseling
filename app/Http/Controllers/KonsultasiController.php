@@ -11,22 +11,34 @@ use App\Services\WhatsAppNotificationService;
 
 class KonsultasiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         
+        $query = Konsultasi::with(['user', 'conversations.sender']);
+        
         if ($user->hasRole('siswa')) {
             // Siswa hanya bisa melihat konsultasi miliknya sendiri
-            $konsultasi = Konsultasi::with(['user', 'conversations.sender'])
-                ->where('id_siswa', $user->id)
-                ->orderBy('created_at', 'desc')
-                ->get();
-        } else {
-            // Guru BK bisa melihat semua konsultasi
-            $konsultasi = Konsultasi::with(['user', 'conversations.sender'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $query->where('id_siswa', $user->id);
         }
+        
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('case_status', $request->status);
+        }
+        
+        // Filter by search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('isi_curhat', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        $konsultasi = $query->orderBy('created_at', 'desc')->paginate(10);
         
         return view('konsultasi.index', compact('konsultasi'));
     }

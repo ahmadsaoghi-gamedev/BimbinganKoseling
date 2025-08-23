@@ -121,6 +121,23 @@ class CekMasalah extends Model
         $nomorMasalahPerKategori = [];
         $totalMasalah = 0;
 
+        // Map masalah_terpilih to DCM numbers based on content matching
+        $masalahMapping = [
+            'Masalah keluarga' => 3, // Kehidupan keluarga
+            'Kurang percaya diri' => 6, // Hub. Pribadi
+            'Sulit bergaul dengan teman' => 6, // Hub. Pribadi
+            'Kesehatan' => 1,
+            'Keadaan Ekonomi' => 2,
+            'Agama & Moral' => 4,
+            'Rekreasi & Hoby' => 5,
+            'Kehidupan sos & org' => 7,
+            'Masalah remaja' => 8,
+            'Cara belajar' => 9,
+            'Penyesuaian thd kurikulum' => 10,
+            'Kebiasaan Belajar' => 11,
+            'Masa depan & Cita-cita' => 12,
+        ];
+
         foreach ($kategoriMasalah as $kategori) {
             if (!isset($daftarMasalah[$kategori])) continue;
             
@@ -131,11 +148,12 @@ class CekMasalah extends Model
             
             // Find selected problems in this category
             foreach ($masalahTerpilih as $masalah) {
-                foreach ($masalahKategori as $nomor => $namaMasalah) {
-                    if ($masalah === $namaMasalah) {
+                if (isset($masalahMapping[$masalah])) {
+                    $nomor = $masalahMapping[$masalah];
+                    // Check if this number belongs to current category
+                    if (isset($masalahKategori[$nomor])) {
                         $masalahTerpilihKategori[] = $masalah;
                         $nomorTerpilih[] = $nomor;
-                        break;
                     }
                 }
             }
@@ -155,7 +173,6 @@ class CekMasalah extends Model
         }
 
         // Calculate overall percentage
-        $totalKeseluruhan = array_sum(array_column($daftarMasalah, null));
         $totalKeseluruhan = count($daftarMasalah['pribadi']) + count($daftarMasalah['sosial']) + 
                            count($daftarMasalah['belajar']) + count($daftarMasalah['karir']);
         

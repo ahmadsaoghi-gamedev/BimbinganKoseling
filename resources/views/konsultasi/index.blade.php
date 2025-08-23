@@ -1,293 +1,310 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="font-sans antialiased bg-gray-100">
-    <div class="min-h-screen">
-        @include('layouts.navigation')
+@extends('layouts.app')
 
-        <!-- Red Header Section -->
-        <div class="bg-red-800 text-white py-4">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-2xl font-bold">BIMBINGAN KONSELING</h1>
-                @hasrole('siswa')
-                <p class="text-red-200 text-sm mt-1">Riwayat konsultasi dan komunikasi dengan Guru BK</p>
-                @else
-                <p class="text-red-200 text-sm mt-1">Kelola konsultasi siswa</p>
-                @endhasrole
+@section('title', 'Bimbingan Konseling')
+
+@section('content')
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <!-- Welcome Message -->
+        @php
+            $userRole = 'admin';
+            if(auth()->user()->hasRole('siswa')) $userRole = 'siswa';
+            elseif(auth()->user()->hasRole('gurubk')) $userRole = 'gurubk';
+        @endphp
+
+        @if(auth()->user()->hasRole('siswa'))
+        <x-welcome-message 
+            userRole="siswa" 
+            :userName="auth()->user()->name"
+        />
+        @endif
+
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg mb-8">
+            <div class="px-6 py-8 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">
+                            💬 Bimbingan Konseling
+                        </h1>
+                        @if(auth()->user()->hasRole('siswa'))
+                        <p class="text-blue-100 text-lg">
+                            Tempat aman untuk konsultasi dengan Guru BK
+                        </p>
+                        @else
+                        <p class="text-blue-100 text-lg">
+                            Kelola konsultasi siswa dengan efisien
+                        </p>
+                        @endif
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="py-8">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                @if($konsultasi->isEmpty())
-                    <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-                        <i class="fas fa-comments text-gray-400 text-6xl mb-4"></i>
-                        @hasrole('siswa')
-                        <p class="text-gray-500 text-lg mb-4">Anda belum pernah mengirim konsultasi.</p>
-                        <a href="{{ route('konsultasi.create') }}" 
-                           class="inline-flex items-center px-8 py-4 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out focus:outline-none"
-                           style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%); border: 2px solid #7f1d1d;">
-                            <i class="fas fa-plus mr-3 text-xl" style="color: white;"></i>
-                            <span class="font-bold" style="color: white;">Kirim Konsultasi Pertama</span>
-                        </a>
-                        @else
-                        <p class="text-gray-500 text-lg">Tidak ada konsultasi saat ini.</p>
-                        @endhasrole
+        <!-- Quick Actions -->
+        @if(auth()->user()->hasRole('siswa'))
+        <div class="mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <x-user-friendly-card 
+                    title="Buat Konsultasi" 
+                    description="Mulai konsultasi baru dengan Guru BK"
+                    :href="route('konsultasi.create')"
+                    userRole="siswa"
+                />
+                
+                <x-user-friendly-card 
+                    title="Curhat Rahasia" 
+                    description="Curhat pribadi yang dijaga kerahasiaannya"
+                    :href="route('curhat-reports.index')"
+                    userRole="siswa"
+                />
+                
+                <x-user-friendly-card 
+                    title="Cek Masalah" 
+                    description="Identifikasi masalah yang Anda hadapi"
+                    :href="route('gurubk.daftar-cek-masalah')"
+                    userRole="siswa"
+                />
+            </div>
+        </div>
+        @endif
+
+        <!-- Statistics Cards -->
+        @if(auth()->user()->hasRole('gurubk'))
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                        </svg>
                     </div>
-                @else
-                    <div class="space-y-6">
-                        @foreach($konsultasi as $item)
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                            <!-- Header Card -->
-                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-user text-white"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="font-semibold text-gray-900">{{ $item->user->name ?? 'N/A' }}</h3>
-                                            <p class="text-sm text-gray-500">{{ $item->created_at->format('d M Y, H:i') }}</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        @php
-                                            $hasConversations = $item->conversations->count() > 0;
-                                        @endphp
-                                        
-                                        @if($hasConversations)
-                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                <i class="fas fa-comments mr-1"></i>
-                                                Dalam Percakapan
-                                            </span>
-                                        @elseif($item->reply_guru)
-                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                <i class="fas fa-check-circle mr-1"></i>
-                                                Sudah Dibalas
-                                            </span>
-                                        @else
-                                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                <i class="fas fa-clock mr-1"></i>
-                                                @hasrole('siswa')
-                                                Menunggu Balasan
-                                                @else
-                                                Belum Dibalas
-                                                @endhasrole
-                                            </span>
-                                        @endif
-                                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Konsultasi</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            {{ \App\Models\Konsultasi::count() }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-200 dark:bg-red-800/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-700 dark:text-red-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Selesai</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            {{ \App\Models\Konsultasi::where('case_status', 'closed')->count() }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-300 dark:bg-red-700/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-800 dark:text-red-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Menunggu</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            {{ \App\Models\Konsultasi::where('case_status', 'open')->count() }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-400 dark:bg-red-600/30 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-900 dark:text-red-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Siswa Aktif</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            {{ \App\Models\Konsultasi::distinct('id_siswa')->count() }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Main Content -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            @if(auth()->user()->hasRole('siswa'))
+                                📋 Riwayat Konsultasi Saya
+                            @else
+                                📋 Daftar Konsultasi
+                            @endif
+                        </h2>
+                        <p class="text-gray-600 dark:text-gray-400 mt-1">
+                            @if(auth()->user()->hasRole('siswa'))
+                                Lihat semua konsultasi yang telah Anda buat
+                            @else
+                                Kelola semua konsultasi siswa
+                            @endif
+                        </p>
+                    </div>
+                    
+                    @if(auth()->user()->hasRole('siswa'))
+                    <a href="{{ route('konsultasi.create') }}" 
+                       class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Buat Konsultasi
+                    </a>
+                    @endif
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                    <form method="GET" action="{{ route('konsultasi.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Status
+                            </label>
+                            <select name="status" id="status"
+                                    class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                                <option value="">Semua Status</option>
+                                <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Terbuka</option>
+                                <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Selesai</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Cari
+                            </label>
+                            <input type="text" name="search" id="search" 
+                                   value="{{ request('search') }}"
+                                   placeholder="Cari judul atau isi..."
+                                   class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                        </div>
+
+                        <div class="flex items-end space-x-2">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Filter
+                            </button>
+                            <a href="{{ route('konsultasi.index') }}"
+                               class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Konsultasi List -->
+                <div class="space-y-4">
+                    @forelse($konsultasi as $item)
+                    <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                        {{ $item->judul }}
+                                    </h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        {{ $item->case_status == 'open' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' }}">
+                                        {{ $item->case_status == 'open' ? 'Terbuka' : 'Selesai' }}
+                                    </span>
+                                </div>
+                                
+                                <p class="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                                    {{ Str::limit($item->isi, 200) }}
+                                </p>
+                                
+                                <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        {{ $item->user->name ?? 'N/A' }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        {{ $item->created_at->format('d/m/Y H:i') }}
+                                    </span>
                                 </div>
                             </div>
-
-                            <!-- Content -->
-                            <div class="p-6">
-                                <!-- Original Message -->
-                                <div class="mb-6">
-                                    <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                <i class="fas fa-user text-white text-sm"></i>
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="flex items-center justify-between mb-2">
-                                                    <span class="text-sm font-medium text-blue-800">Pesan Awal - {{ $item->user->name }}</span>
-                                                    <span class="text-xs text-blue-600">{{ $item->created_at->format('d M Y, H:i') }}</span>
-                                                </div>
-                                                <p class="text-gray-800 leading-relaxed">{{ $item->isi_curhat }}</p>
-                                                @if($item->attachment)
-                                                    <div class="mt-3">
-                                                        <a href="{{ asset('storage/' . $item->attachment) }}" 
-                                                           target="_blank" 
-                                                           class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors duration-200">
-                                                            <i class="fas fa-paperclip mr-2"></i>
-                                                            Lihat Lampiran
-                                                        </a>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Conversations -->
-                                @if($item->conversations->count() > 0)
-                                    <div class="space-y-4 mb-6">
-                                        @foreach($item->conversations as $conversation)
-                                            <div class="@if($conversation->sender_type == 'gurubk') ml-8 @else mr-8 @endif">
-                                                <div class="@if($conversation->sender_type == 'gurubk') bg-green-50 border-l-4 border-green-500 @else bg-gray-50 border-l-4 border-gray-500 @endif rounded-lg p-4">
-                                                    <div class="flex items-start space-x-3">
-                                                        <div class="w-8 h-8 @if($conversation->sender_type == 'gurubk') bg-green-500 @else bg-gray-500 @endif rounded-full flex items-center justify-center flex-shrink-0">
-                                                            <i class="fas @if($conversation->sender_type == 'gurubk') fa-user-tie @else fa-user @endif text-white text-sm"></i>
-                                                        </div>
-                                                        <div class="flex-1">
-                                                            <div class="flex items-center justify-between mb-2">
-                                                                <span class="text-sm font-medium @if($conversation->sender_type == 'gurubk') text-green-800 @else text-gray-800 @endif">
-                                                                    @if($conversation->sender_type == 'gurubk')
-                                                                        Guru BK
-                                                                    @else
-                                                                        {{ $conversation->sender->name }}
-                                                                    @endif
-                                                                </span>
-                                                                <span class="text-xs @if($conversation->sender_type == 'gurubk') text-green-600 @else text-gray-600 @endif">
-                                                                    {{ $conversation->created_at->format('d M Y, H:i') }}
-                                                                </span>
-                                                            </div>
-                                                            <p class="text-gray-800 leading-relaxed">{{ $conversation->message }}</p>
-                                                            @if($conversation->attachment)
-                                                                <div class="mt-3">
-                                                                    <a href="{{ asset('storage/' . $conversation->attachment) }}" 
-                                                                       target="_blank" 
-                                                                       class="inline-flex items-center px-3 py-2 @if($conversation->sender_type == 'gurubk') bg-green-100 text-green-700 hover:bg-green-200 @else bg-gray-100 text-gray-700 hover:bg-gray-200 @endif rounded-lg transition-colors duration-200">
-                                                                        <i class="fas fa-paperclip mr-2"></i>
-                                                                        Lihat Lampiran
-                                                                    </a>
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                <!-- Legacy Reply (jika ada) -->
-                                @if($item->reply_guru && $item->conversations->count() == 0)
-                                    <div class="mb-6 ml-8">
-                                        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-                                            <div class="flex items-start space-x-3">
-                                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas fa-user-tie text-white text-sm"></i>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <div class="flex items-center justify-between mb-2">
-                                                        <span class="text-sm font-medium text-green-800">Balasan Guru BK</span>
-                                                        <span class="text-xs text-green-600">{{ $item->reply_date->format('d M Y, H:i') }}</span>
-                                                    </div>
-                                                    <p class="text-gray-800 leading-relaxed">{{ $item->reply_guru }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                <!-- Reply Form -->
-                                <div class="border-t border-gray-200 pt-6">
-                                    <form action="{{ route('konsultasi.balas') }}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        <input type="hidden" name="konsultasi_id" value="{{ $item->id }}">
-                                        
-                                        <div class="mb-4">
-                                            <label for="message_{{ $item->id }}" class="block text-sm font-medium text-gray-700 mb-2">
-                                                <i class="fas fa-reply mr-2 text-blue-500"></i>
-                                                @hasrole('siswa')
-                                                Balas Pesan
-                                                @else
-                                                Tulis Balasan Anda
-                                                @endhasrole
-                                            </label>
-                                            <textarea 
-                                                id="message_{{ $item->id }}" 
-                                                name="message" 
-                                                rows="4" 
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
-                                                placeholder="@hasrole('siswa')Ketik balasan Anda...@elseKetik balasan Anda untuk siswa...@endhasrole"
-                                                required
-                                            ></textarea>
-                                        </div>
-                                        
-                                        <div class="mb-4">
-                                            <label for="attachment_{{ $item->id }}" class="block text-sm font-medium text-gray-700 mb-2">
-                                                <i class="fas fa-paperclip mr-2 text-gray-500"></i>
-                                                Lampiran (Opsional)
-                                            </label>
-                                            <input 
-                                                type="file" 
-                                                id="attachment_{{ $item->id }}" 
-                                                name="attachment" 
-                                                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            >
-                                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, PDF, DOC, DOCX. Maksimal 2MB.</p>
-                                        </div>
-                                        
-                                        <div class="flex justify-end mt-3">
-                                            <button 
-                                                type="submit" 
-                                                class="inline-flex items-center px-6 py-3 bg-red-800 hover:bg-red-900 text-white font-semibold text-sm rounded-lg border border-red-900 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-50"
-                                            >
-                                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                                                </svg>
-                                                <span class="font-semibold">Kirim Pesan</span>
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
+                            
+                            <div class="flex space-x-2">
+                                <a href="{{ route('konsultasi.show', $item->id) }}"
+                                   class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:text-red-300 dark:bg-red-900/30 dark:hover:bg-red-900/50">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Lihat
+                                </a>
                             </div>
                         </div>
-                        @endforeach
                     </div>
-
-                    <!-- Add New Consultation Button -->
-                    @hasrole('siswa')
-                    <div class="mt-8 text-center">
-                        <a href="{{ route('konsultasi.create') }}" 
-                           class="inline-flex items-center px-8 py-4 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out focus:outline-none"
-                           style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%); border: 2px solid #7f1d1d;">
-                            <i class="fas fa-plus mr-3 text-xl" style="color: white;"></i>
-                            <span class="font-bold" style="color: white;">Kirim Konsultasi Baru</span>
+                    @empty
+                    <div class="text-center py-12">
+                        <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                            Belum ada konsultasi
+                        </h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">
+                            @if(auth()->user()->hasRole('siswa'))
+                                Mulai konsultasi pertama Anda dengan Guru BK
+                            @else
+                                Belum ada konsultasi yang dibuat oleh siswa
+                            @endif
+                        </p>
+                        @if(auth()->user()->hasRole('siswa'))
+                        <a href="{{ route('konsultasi.create') }}"
+                           class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Buat Konsultasi Pertama
                         </a>
+                        @endif
                     </div>
-                    @endhasrole
+                    @endforelse
+                </div>
+
+                <!-- Pagination -->
+                @if($konsultasi->hasPages())
+                <div class="mt-6">
+                    {{ $konsultasi->appends(request()->query())->links() }}
+                </div>
                 @endif
             </div>
         </div>
     </div>
-
-    <!-- SweetAlert for notifications -->
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-
-        @if(session('alert-type'))
-            var type = "{{ Session::get('alert-type') }}";
-            switch (type) {
-                case 'success':
-                    Toast.fire({
-                        icon: 'success',
-                        title: "{{ Session::get('message') }}"
-                    });
-                    break;
-                case 'error':
-                    Toast.fire({
-                        icon: 'error',
-                        title: "{{ Session::get('message') }}"
-                    });
-                    break;
-            }
-        @endif
-    </script>
-</body>
-</html>
+</div>
+@endsection

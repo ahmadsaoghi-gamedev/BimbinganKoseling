@@ -1,9 +1,8 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Bimbingan Lanjutan') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
+
+@section('title', 'Edit Bimbingan Lanjutan')
+
+@section('content')
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
@@ -49,7 +48,7 @@
                                 Tanggal Bimbingan <span class="text-red-500">*</span>
                             </label>
                             <input type="date" name="tanggal_bimbingan" id="tanggal_bimbingan" 
-                                   value="{{ old('tanggal_bimbingan', $bimbingan->tanggal_bimbingan) }}" required
+                                   value="{{ old('tanggal_bimbingan', $bimbingan->tgl_bimbingan) }}" required
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
                             @error('tanggal_bimbingan')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -111,4 +110,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

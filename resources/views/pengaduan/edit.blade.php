@@ -150,7 +150,7 @@
                                 Batal
                             </a>
                             <button type="submit" 
-                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 <i class="fas fa-save mr-2"></i>Update
                             </button>
                         </div>

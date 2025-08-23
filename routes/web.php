@@ -10,7 +10,7 @@ use App\Http\Controllers\KonsultasiController;
 
 Route::get('/', function () { return view('welcome'); });
 
-Route::get('/dashboard', function () { return view('dashboard'); })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () { return view('dashboard'); })->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -144,6 +144,63 @@ Route::middleware('auth')->group(function () {
         Route::post('/update-siswa-phone/{id}', [App\Http\Controllers\WhatsAppController::class, 'updateSiswaPhone'])->name('update-siswa-phone');
         Route::post('/send-broadcast', [App\Http\Controllers\WhatsAppController::class, 'sendBroadcast'])->name('send-broadcast');
         Route::get('/logs', [App\Http\Controllers\WhatsAppController::class, 'viewLogs'])->name('logs');
+    });
+
+    // Curhat Reports Routes - Sistem Rekap Curhat Rahasia
+    Route::middleware('role:gurubk|siswa|admin')->group(function () {
+        Route::get('curhat-reports/dashboard', [App\Http\Controllers\CurhatReportController::class, 'dashboard'])->name('curhat-reports.dashboard');
+        Route::get('curhat-reports/export', [App\Http\Controllers\CurhatReportController::class, 'export'])->name('curhat-reports.export');
+        Route::resource('curhat-reports', App\Http\Controllers\CurhatReportController::class);
+    });
+
+    // Violation Reports Routes - Sistem Rekap Pelanggaran
+    Route::middleware('role:gurubk|kesiswaan|admin|siswa')->group(function () {
+        Route::get('violation-reports', [App\Http\Controllers\ViolationReportController::class, 'index'])->name('violation-reports.index');
+    });
+
+    // Admin, Guru BK, Kesiswaan can access all violation report features
+    Route::middleware('role:gurubk|kesiswaan|admin')->group(function () {
+        Route::get('violation-reports/dashboard', [App\Http\Controllers\ViolationReportController::class, 'dashboard'])->name('violation-reports.dashboard');
+        Route::get('violation-reports/export', [App\Http\Controllers\ViolationReportController::class, 'export'])->name('violation-reports.export');
+        Route::get('violation-reports/create', [App\Http\Controllers\ViolationReportController::class, 'create'])->name('violation-reports.create');
+        Route::post('violation-reports', [App\Http\Controllers\ViolationReportController::class, 'store'])->name('violation-reports.store');
+        Route::get('violation-reports/{violation_report}/edit', [App\Http\Controllers\ViolationReportController::class, 'edit'])->name('violation-reports.edit');
+        Route::put('violation-reports/{violation_report}', [App\Http\Controllers\ViolationReportController::class, 'update'])->name('violation-reports.update');
+        Route::patch('violation-reports/{violation_report}', [App\Http\Controllers\ViolationReportController::class, 'update'])->name('violation-reports.update');
+        Route::delete('violation-reports/{violation_report}', [App\Http\Controllers\ViolationReportController::class, 'destroy'])->name('violation-reports.destroy');
+    });
+
+    // Violation Reports show route - accessible by all roles
+    Route::middleware('role:gurubk|kesiswaan|admin|siswa')->group(function () {
+        Route::get('violation-reports/{violation_report}', [App\Http\Controllers\ViolationReportController::class, 'show'])->name('violation-reports.show');
+    });
+
+    // Case Resolution Routes - Sistem Solusi Akhir
+    Route::middleware('role:gurubk|admin|siswa')->group(function () {
+        Route::get('case-resolution/dashboard', [App\Http\Controllers\CaseResolutionController::class, 'dashboard'])->name('case-resolution.dashboard');
+        Route::get('case-resolution', [App\Http\Controllers\CaseResolutionController::class, 'index'])->name('case-resolution.index');
+        Route::get('case-resolution/{type}/{id}', [App\Http\Controllers\CaseResolutionController::class, 'show'])->name('case-resolution.show');
+        Route::get('case-resolution/{type}/{id}/resolve', [App\Http\Controllers\CaseResolutionController::class, 'resolve'])->name('case-resolution.resolve');
+        Route::post('case-resolution/{type}/{id}/resolve', [App\Http\Controllers\CaseResolutionController::class, 'storeResolution'])->name('case-resolution.store-resolution');
+        Route::patch('case-resolution/{type}/{id}/status', [App\Http\Controllers\CaseResolutionController::class, 'updateStatus'])->name('case-resolution.update-status');
+    });
+
+    // Summon Routes - Sistem Pemanggilan (Surat/WhatsApp/Email)
+    Route::middleware('role:gurubk|admin|kesiswaan')->group(function () {
+        Route::get('summons/dashboard', [App\Http\Controllers\SummonController::class, 'dashboard'])->name('summons.dashboard');
+        Route::get('summons', [App\Http\Controllers\SummonController::class, 'index'])->name('summons.index');
+        Route::get('summons/create', [App\Http\Controllers\SummonController::class, 'create'])->name('summons.create');
+        Route::post('summons', [App\Http\Controllers\SummonController::class, 'store'])->name('summons.store');
+        Route::get('summons/{summon}', [App\Http\Controllers\SummonController::class, 'show'])->name('summons.show');
+        Route::get('summons/{summon}/edit', [App\Http\Controllers\SummonController::class, 'edit'])->name('summons.edit');
+        Route::put('summons/{summon}', [App\Http\Controllers\SummonController::class, 'update'])->name('summons.update');
+        Route::delete('summons/{summon}', [App\Http\Controllers\SummonController::class, 'destroy'])->name('summons.destroy');
+        Route::post('summons/{summon}/send', [App\Http\Controllers\SummonController::class, 'send'])->name('summons.send');
+        Route::post('summons/{summon}/mark-attended', [App\Http\Controllers\SummonController::class, 'markAttended'])->name('summons.mark-attended');
+        Route::post('summons/{summon}/mark-not-attended', [App\Http\Controllers\SummonController::class, 'markNotAttended'])->name('summons.mark-not-attended');
+        Route::post('summons/{summon}/cancel', [App\Http\Controllers\SummonController::class, 'cancel'])->name('summons.cancel');
+        Route::post('summons/generate-template', [App\Http\Controllers\SummonController::class, 'generateTemplate'])->name('summons.generate-template');
+        Route::post('summons/auto-generate', [App\Http\Controllers\SummonController::class, 'autoGenerateSummons'])->name('summons.auto-generate');
     });
 });
 
