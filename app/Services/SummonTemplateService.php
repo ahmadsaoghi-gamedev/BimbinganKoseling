@@ -11,11 +11,11 @@ class SummonTemplateService
     /**
      * Generate violation summon letter template
      */
-    public function generateViolationSummonLetter(Siswa $siswa, array $violations = [], string $scheduledDate = null): array
+    public function generateViolationSummonLetter(Siswa $siswa, $violations = [], string $scheduledDate = null): array
     {
         try {
             $totalPoints = Pelanggaran::getTotalPointsForStudent($siswa->id);
-            $latestViolation = $violations[0] ?? null;
+            $latestViolation = $violations->first();
             
             $scheduledDate = $scheduledDate ? Carbon::parse($scheduledDate) : now()->addDays(3);
             
@@ -32,7 +32,7 @@ class SummonTemplateService
                 'recipient_contact' => $siswa->no_tlp_ortu ?? $siswa->no_tlp,
                 'metadata' => [
                     'total_points' => $totalPoints,
-                    'violation_count' => count($violations),
+                    'violation_count' => $violations->count(),
                     'latest_violation' => $latestViolation ? $latestViolation->jenis_pelanggaran : null,
                     'template_type' => 'violation_summon',
                 ]
@@ -61,10 +61,10 @@ class SummonTemplateService
     /**
      * Generate WhatsApp summon message template
      */
-    public function generateViolationWhatsAppMessage(Siswa $siswa, array $violations = [], string $scheduledDate = null): array
+    public function generateViolationWhatsAppMessage(Siswa $siswa, $violations = [], string $scheduledDate = null): array
     {
         $totalPoints = Pelanggaran::getTotalPointsForStudent($siswa->id);
-        $latestViolation = $violations[0] ?? null;
+        $latestViolation = $violations->first();
         
         $scheduledDate = $scheduledDate ? Carbon::parse($scheduledDate) : now()->addDays(3);
         
@@ -79,7 +79,7 @@ class SummonTemplateService
             'recipient_contact' => $siswa->no_tlp_ortu ?? $siswa->no_tlp,
             'metadata' => [
                 'total_points' => $totalPoints,
-                'violation_count' => count($violations),
+                'violation_count' => $violations->count(),
                 'latest_violation' => $latestViolation ? $latestViolation->jenis_pelanggaran : null,
                 'template_type' => 'violation_whatsapp',
             ]
@@ -89,10 +89,10 @@ class SummonTemplateService
     /**
      * Generate email summon template
      */
-    public function generateViolationEmailTemplate(Siswa $siswa, array $violations = [], string $scheduledDate = null): array
+    public function generateViolationEmailTemplate(Siswa $siswa, $violations = [], string $scheduledDate = null): array
     {
         $totalPoints = Pelanggaran::getTotalPointsForStudent($siswa->id);
-        $latestViolation = $violations[0] ?? null;
+        $latestViolation = $violations->first();
         
         $scheduledDate = $scheduledDate ? Carbon::parse($scheduledDate) : now()->addDays(3);
         
@@ -109,7 +109,7 @@ class SummonTemplateService
             'recipient_contact' => $siswa->email_ortu ?? $siswa->email,
             'metadata' => [
                 'total_points' => $totalPoints,
-                'violation_count' => count($violations),
+                'violation_count' => $violations->count(),
                 'latest_violation' => $latestViolation ? $latestViolation->jenis_pelanggaran : null,
                 'template_type' => 'violation_email',
             ]

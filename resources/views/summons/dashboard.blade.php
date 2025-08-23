@@ -19,7 +19,7 @@
                     </div>
                     <div class="flex space-x-3">
                         <a href="{{ route('summons.create') }}"
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                           class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <i class="fas fa-plus mr-2"></i>
                             Buat Pemanggilan
                         </a>
@@ -33,7 +33,7 @@
 
                 <!-- Statistics Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <a href="{{ route('summons.index') }}" class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-800">
                                 <i class="fas fa-envelope text-blue-600 dark:text-blue-400 text-xl"></i>
@@ -43,9 +43,9 @@
                                 <p class="text-2xl font-bold text-blue-900 dark:text-blue-100">{{ $stats['total_summons'] ?? 0 }}</p>
                             </div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                    <a href="{{ route('summons.index', ['status' => 'draft']) }}" class="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-700 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-800">
                                 <i class="fas fa-edit text-yellow-600 dark:text-yellow-400 text-xl"></i>
@@ -55,9 +55,9 @@
                                 <p class="text-2xl font-bold text-yellow-900 dark:text-yellow-100">{{ $stats['draft_summons'] ?? 0 }}</p>
                             </div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <a href="{{ route('summons.index', ['status' => 'sent']) }}" class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg border border-purple-200 dark:border-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-800">
                                 <i class="fas fa-paper-plane text-purple-600 dark:text-purple-400 text-xl"></i>
@@ -67,9 +67,9 @@
                                 <p class="text-2xl font-bold text-purple-900 dark:text-purple-100">{{ $stats['sent_summons'] ?? 0 }}</p>
                             </div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-700">
+                    <a href="{{ route('summons.index', ['status' => 'attended']) }}" class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-700 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-green-100 dark:bg-green-800">
                                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
@@ -79,12 +79,12 @@
                                 <p class="text-2xl font-bold text-green-900 dark:text-green-100">{{ $stats['attended_summons'] ?? 0 }}</p>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- Quick Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-6">
+                    <a href="{{ route('summons.index') }}" class="bg-white dark:bg-gray-700 shadow rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100">Hari Ini</h4>
                             <span class="text-2xl font-bold text-blue-600">{{ $stats['today_summons'] ?? 0 }}</span>
@@ -92,9 +92,9 @@
                         <div class="text-sm text-gray-600 dark:text-gray-400">
                             Pemanggilan yang dijadwalkan hari ini
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-6">
+                    <a href="{{ route('summons.index') }}" class="bg-white dark:bg-gray-700 shadow rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer">
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100">Minggu Ini</h4>
                             <span class="text-2xl font-bold text-green-600">{{ $stats['this_week_summons'] ?? 0 }}</span>
@@ -102,7 +102,7 @@
                         <div class="text-sm text-gray-600 dark:text-gray-400">
                             Pemanggilan yang dijadwalkan minggu ini
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- Recent Summons -->

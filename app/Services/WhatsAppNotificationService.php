@@ -360,4 +360,47 @@ class WhatsAppNotificationService
             return false;
         }
     }
+
+    /**
+     * Kirim notifikasi kasus terselesaikan
+     */
+    public function notifyCaseResolved($siswaId, $caseType)
+    {
+        try {
+            $siswa = \App\Models\Siswa::findOrFail($siswaId);
+            $whatsappNumber = $siswa->getWhatsAppNumber();
+            
+            if (!$whatsappNumber) {
+                Log::warning("No WhatsApp number found for student: {$siswa->nama} (ID: {$siswaId})");
+                return false;
+            }
+
+            $caseTypeText = match($caseType) {
+                'konsultasi' => 'Konsultasi',
+                'cek_masalah' => 'Cek Masalah',
+                'pengaduan' => 'Pengaduan',
+                default => 'Kasus'
+            };
+
+            $message = "✅ *KASUS TERSELESAIKAN* ✅\n\n";
+            $message .= "Halo {$siswa->nama},\n\n";
+            $message .= "Kasus {$caseTypeText} Anda telah berhasil diselesaikan oleh Guru BK.\n";
+            $message .= "Silakan cek aplikasi untuk melihat detail hasil akhir.\n\n";
+            $message .= "Terima kasih atas kepercayaan Anda.\n\n";
+            $message .= "_Pesan otomatis dari Sistem Bimbingan Konseling_";
+
+            $result = $this->sendMessage($whatsappNumber, $message);
+            
+            if ($result) {
+                Log::info("Case resolution notification sent successfully to {$siswa->nama} ({$whatsappNumber})");
+            } else {
+                Log::error("Failed to send case resolution notification to {$siswa->nama}");
+            }
+            
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('Error sending case resolution notification: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -167,11 +167,40 @@
             />
             @endif
 
+            @if(auth()->user()->hasRole('admin'))
+            <x-user-friendly-card 
+                title="Resolusi Kasus" 
+                description="Tracking proses konseling dan hasil akhir"
+                :href="route('case-resolution.dashboard')"
+                :userRole="$userRole"
+            />
+            @endif
+
+            <!-- Case Resolution Card for Students -->
+            @if(auth()->user()->hasRole('siswa'))
+            <x-user-friendly-card 
+                title="Resolusi Kasus" 
+                description="Lihat status dan hasil kasus Anda"
+                :href="route('case-resolution.dashboard')"
+                :userRole="$userRole"
+            />
+            @endif
+
             @if(auth()->user()->hasRole('siswa') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))
             <x-user-friendly-card 
                 title="Rekap Bimbingan" 
                 description="Mengelola Rekap Bimbingan"
                 :href="route('rekap.index')"
+                :userRole="$userRole"
+            />
+            @endif
+
+            <!-- Case Resolution Card for Students -->
+            @if(auth()->user()->hasRole('siswa'))
+            <x-user-friendly-card 
+                title="Resolusi Kasus" 
+                description="Lihat status dan hasil kasus Anda"
+                :href="route('case-resolution.dashboard')"
                 :userRole="$userRole"
             />
             @endif
@@ -186,12 +215,19 @@
             @endif
 
             @if(auth()->user()->hasRole('gurubk'))
-            <x-user-friendly-card 
-                title="Bimbingan Lanjutan" 
-                description="Tindak lanjut kasus bimbingan"
-                :href="route('gurubk.bimbingan-lanjutan')"
-                :userRole="$userRole"
-            />
+                            <x-user-friendly-card 
+                    title="Bimbingan Lanjutan" 
+                    description="Tindak lanjut kasus bimbingan"
+                    :href="route('gurubk.bimbingan-lanjutan')"
+                    :userRole="$userRole"
+                />
+                
+                <x-user-friendly-card 
+                    title="Resolusi Kasus" 
+                    description="Tracking proses konseling dan hasil akhir"
+                    :href="route('case-resolution.dashboard')"
+                    :userRole="$userRole"
+                />
             @endif
 
             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('gurubk'))

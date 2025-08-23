@@ -14,7 +14,7 @@
                     </h2>
                     @hasrole('gurubk')
                     <a href="{{ route('rekap.create') }}" 
-                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                         Tambah Data
                     </a>
                     @endhasrole
@@ -50,7 +50,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('rekap.edit', $data->id) }}" 
-                                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs">
+                                           class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-xs">
                                             Balas
                                         </a>
                                         <form action="{{ route('rekap.destroy', $data->id) }}" method="POST" class="inline">

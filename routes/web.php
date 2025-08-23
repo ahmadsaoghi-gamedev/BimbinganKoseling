@@ -179,10 +179,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:gurubk|admin|siswa')->group(function () {
         Route::get('case-resolution/dashboard', [App\Http\Controllers\CaseResolutionController::class, 'dashboard'])->name('case-resolution.dashboard');
         Route::get('case-resolution', [App\Http\Controllers\CaseResolutionController::class, 'index'])->name('case-resolution.index');
-        Route::get('case-resolution/{type}/{id}', [App\Http\Controllers\CaseResolutionController::class, 'show'])->name('case-resolution.show');
-        Route::get('case-resolution/{type}/{id}/resolve', [App\Http\Controllers\CaseResolutionController::class, 'resolve'])->name('case-resolution.resolve');
-        Route::post('case-resolution/{type}/{id}/resolve', [App\Http\Controllers\CaseResolutionController::class, 'storeResolution'])->name('case-resolution.store-resolution');
-        Route::patch('case-resolution/{type}/{id}/status', [App\Http\Controllers\CaseResolutionController::class, 'updateStatus'])->name('case-resolution.update-status');
+        Route::get('case-resolution/{id}/{type}', [App\Http\Controllers\CaseResolutionController::class, 'show'])->name('case-resolution.show');
+        Route::patch('case-resolution/{id}/{type}', [App\Http\Controllers\CaseResolutionController::class, 'update'])->name('case-resolution.update');
+        Route::get('case-resolution/generate-report', [App\Http\Controllers\CaseResolutionController::class, 'generateReport'])->name('case-resolution.generate-report');
     });
 
     // Summon Routes - Sistem Pemanggilan (Surat/WhatsApp/Email)

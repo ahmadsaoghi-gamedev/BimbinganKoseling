@@ -72,8 +72,7 @@ class SummonController extends Controller
             $siswa = Siswa::findOrFail($request->siswa_id);
             $violations = Pelanggaran::where('id_siswa', $siswa->id)
                 ->orderBy('created_at', 'desc')
-                ->get()
-                ->toArray();
+                ->get();
         }
 
         $siswas = Siswa::orderBy('nama')->get();
@@ -272,8 +271,7 @@ class SummonController extends Controller
             $siswa = Siswa::findOrFail($request->siswa_id);
             $violations = Pelanggaran::where('id_siswa', $siswa->id)
                 ->orderBy('created_at', 'desc')
-                ->get()
-                ->toArray();
+                ->get();
 
             $scheduledDate = $request->scheduled_at;
 
@@ -387,12 +385,11 @@ class SummonController extends Controller
     public function autoGenerateSummons()
     {
         try {
-            // Get students with critical violations (70+ points)
-            $criticalStudents = Siswa::whereHas('pelanggaran', function ($query) {
-                $query->selectRaw('id_siswa, SUM(point_pelanggaran) as total_points')
-                      ->groupBy('id_siswa')
-                      ->havingRaw('SUM(point_pelanggaran) >= ?', [70]);
-            })->get();
+            // Get students with critical violations (70+ points) - simplified query
+            $criticalStudents = Siswa::with('pelanggaran')->get()->filter(function ($siswa) {
+                $totalPoints = $siswa->pelanggaran->sum('point_pelanggaran');
+                return $totalPoints >= 70;
+            });
 
             $generatedCount = 0;
 
@@ -409,8 +406,7 @@ class SummonController extends Controller
 
                 $violations = Pelanggaran::where('id_siswa', $student->id)
                     ->orderBy('created_at', 'desc')
-                    ->get()
-                    ->toArray();
+                    ->get();
 
                 // Generate template with error handling
                 try {
@@ -450,11 +446,15 @@ class SummonController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Auto-generate summons error: " . $e->getMessage());
+            \Log::error("Auto-generate summons error: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat generate surat pemanggilan otomatis.',
+                'message' => 'Terjadi kesalahan saat generate surat pemanggilan otomatis: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }

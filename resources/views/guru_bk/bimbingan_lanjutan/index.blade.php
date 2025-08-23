@@ -13,7 +13,7 @@
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Bimbingan Lanjutan</h2>
                     @hasrole('gurubk')
                     <a href="{{ route('gurubk.bimbingan-lanjutan.create') }}" 
-                       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                       class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                         <i class="fas fa-plus mr-2"></i>Tambah Bimbingan Lanjutan
                     </a>
                     @endhasrole
@@ -61,7 +61,7 @@
                                         @hasrole('gurubk')
                                         <div class="flex space-x-2">
                                             <a href="{{ route('gurubk.bimbingan-lanjutan.edit', $bimbingan->id) }}" 
-                                               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs">
+                                               class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-xs">
                                                 <i class="fas fa-edit mr-1"></i> Edit
                                             </a>
                                             <form action="{{ route('gurubk.bimbingan-lanjutan.destroy', $bimbingan->id) }}" 
